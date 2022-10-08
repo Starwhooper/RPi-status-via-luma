@@ -1,3 +1,9 @@
+That project is on very very early status. I past i bought Wareshare 1.44 screens for my Raspberry. But i will change to cheater solutions.
+Thats the reason for this new repository.
+
+I affraid i have to crate the whole tool new, i reason that LCD_1IN44.py (waveshare) and https://github.com/rm-hull/luma.lcd works so different.
+
+
 # RPi-status-on-OLED #
 
 To provide the Status of your Raspberry (tested on 2) to an ST7735S OLED Luna Display.
