@@ -1,12 +1,6 @@
-That project is on very very early status. I past i bought Wareshare 1.44 screens for my Raspberry. But i will change to cheater solutions.
-Thats the reason for this new repository.
+# RPi-status-on-luma #
 
-I affraid i have to crate the whole tool new, i reason that LCD_1IN44.py (waveshare) and https://github.com/rm-hull/luma.lcd works so different.
-
-
-# RPi-status-on-OLED #
-
-To provide the Status of your Raspberry (tested on 2) to an ST7735S OLED Luna Display.
+To provide the Status of your Raspberry (tested on Zero, 2, 3 and 4) to an ST7735S OLED Display.
 
 I use this script to get a quick and up-to-date status of the system every time I walk past my Raspberry Pis.
 In this way I can see at a glance the current workload, whether problems are looming and whether the service is currently running.
@@ -14,11 +8,54 @@ In this way I can see at a glance the current workload, whether problems are loo
 My Raspberrys are mounted in my 19Rack:
 ![Raspberry Pis im Rack](https://github.com/Starwhooper/RPi-status-on-OLED/blob/main/examples/raspberrysinrack.jpg)
 
+Please also note my previous solution based on Wireshark 144: https://github.com/Starwhooper/RPi-status-on-OLED
 ## Example ##
 
 ![Display](https://github.com/Starwhooper/RPi-status-on-OLED/blob/main/examples/before_2020-09.png)
 ![Display](https://github.com/Starwhooper/RPi-status-on-OLED/blob/main/examples/before_2021-06.png)
 ![Display](https://github.com/Starwhooper/RPi-status-on-OLED/blob/main/examples/newest.png)
+
+## Installation ##
+install all needed packages to prepare the software environtent of your Raspberry Pi:
+```bash
+sudo raspi-config
+  and enable Interface type SPI
+```
+![Display](https://github.com/Starwhooper/RPi-status-on-OLED/blob/main/examples/enable_spi.gif)
+```bash
+sudo apt install python3-pip git
+sudo pip3 install luma.lcd json psutil
+```
+and this tool itself:
+```bash
+sudo git clone https://github.com/rm-hull/luma.examples /opt/luma.examples
+sudo git clone https://github.com/Starwhooper/RPi-status-on-luma /opt/RPi-status-on-OLED
+
+sudo sed -i -e '$i \python3 /opt/luma.examples/examples/demo.py --rotate 3 --config /opt/luma.examples/conf/st7735.conf &\n' /etc/rc.local
+```
+
+## Start ##
+add it to rc.local to autostart as boot
+```bash
+sudo nano /etc/rc.local
+/opt/RPi-status-on-luna/status.py &
+```
+
+## Update ##
+If you already use it, feel free to update with
+```bash
+cd /opt/RPi-status-on-luna
+sudo git pull origin main
+```
+
+
+
+----
+
+
+
+
+
 ```
 * DATE: current date
 * IP: IP Address of Pi
@@ -32,31 +69,6 @@ My Raspberrys are mounted in my 19Rack:
 * IMG: name of newest Backup image
 ```
 
-## Installation ##
-install all needed packages to prepare the software environtent of your Raspberry Pi:
-```bash
-sudo raspi-config
-  and enable Interface type SPI
-```
-![Display](https://github.com/Starwhooper/RPi-status-on-OLED/blob/main/examples/enable_spi.gif)
-
-
-
-
-
-___
-now came some stuff from previous sokution at https://github.com/Starwhooper/RPi-status-on-OLED
-
-
-```bash
-sudo apt install python3-pip python3-pil git libatlas-base-dev
-sudo pip3 install RPi.GPIO psutil numpy netifaces spidev
-```
-and this tool itself:
-```bash
-cd /opt
-sudo git clone https://github.com/Starwhooper/RPi-status-on-OLED
-```
 
 OPTIONAL: if you with to get some beauty fonts, to use them to show a prettier hostname, do this:
 ```bash
@@ -70,19 +82,6 @@ sudo nano /opt/RPi-status-on-OLED/config.json
 ```
 Check https://github.com/Starwhooper/RPi-status-on-OLED/wiki/explain-config.json to get more details about the config.json file
 
-## Start ##
-add it to rc.local to autostart as boot
-```bash
-sudo nano /etc/rc.local
-/opt/RPi-status-on-OLED/status.py
-```
-
-## Update ##
-If you already use it, feel free to update with
-```bash
-cd /opt/RPi-status-on-OLED
-sudo git pull origin main
-```
 
 ## Hardware ##
 ### Display ###
