@@ -1,43 +1,55 @@
 {
-  "###backgroundcolor": "BLACK",
-  "###boxmarginleft": 27,
-  "###fontcolor": "WHITE",
-  "###imagerefresh": 0.2,
+  "luma":{
+    "demo_opts.py":{
+		"folder": "/opt/luma.examples/examples"
+	},
+	"config": "/opt/luma.examples/conf/st7735.conf"
+  },
+  "display":{
+	  "width": 128,
+	  "height": 160
+  },
+  "backgroundcolor": "BLACK",
+  "boxmarginleft": 27,
+  "fontcolor": "WHITE",
+  "imagerefresh": 0.2,
   "###lcddriver": "waveshare144",
   "###no_y_scroll_offset": 2,
   "components": [
     "hostname",
-    "###currentdatetime",
-    "###uptime",
+    "currentdatetime",
+    "drive",
+    "uptime",
     "ipping",
-    "###board",
+    "board",
     "cpu",
     "ram",
-    "###temperatur",
+    "temperatur",
     "sd",
-    "###border",
-    "###lastimage",
-    "###os",
-    "###version"
+    "border",
+    "lastbackupimage",
+    "os",
+    "#####version",
+	"helloworld"
   ],
-  "###component_drive": {
-    "###drive": [
-      "/mnt/share1",
-      "/mnt/share2"
+  "component_drive": {
+    "drive": [
+      "/"
     ]
   },
   "font": {
 	"default": false,
     "ttffile": "/opt/luma.examples/examples/fonts/FreePixel.ttf",
-	"size":12
+	"size1":12,
+	"size2":16
   },
-  "###component_ipping": {
-    "###localpingdestination": "",
-    "###pingintervall": 300,
-    "###remotepingdestination": "8.8.8.8"
+  "component_ipping": {
+    "localpingdestination": "",
+    "pingintervall": 300,
+    "remotepingdestination": "8.8.8.8"
   },
-  "###component_lastimage": {
-    "###checkforlatestfile": "/mnt/braavos/images/raspberry/%HOSTNAME%/_image/*.img"
+  "component_lastbackupimage": {
+    "checkforlatestfile": "/mnt/braavos/images/raspberry/%HOSTNAME%/_image/*.img"
   },
   "###pushover": {
     "###messages": 1,
@@ -49,7 +61,7 @@
     "###destination": "/mnt/share/status_%HOSTNAME%.png",
     "###intervall": 3600
   },
-  "###scrollingtextwait": 5,
+  "scrollingtextwait": 5,
   "###wallpaper": {
     "###file": "wp.jpg",
     "###enable": "true",
