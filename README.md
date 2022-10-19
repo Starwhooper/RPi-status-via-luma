@@ -1,4 +1,4 @@
-# RPi-status-on-luma #
+# RPi-status-via-luma #
 
 To provide the Status of your Raspberry (tested on Zero, 2, 3 and 4) to an ST7735S OLED Display.
 
