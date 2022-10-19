@@ -71,4 +71,4 @@ wires:
 
 ### Case ###
 ![Display](https://cdn.thingiverse.com/assets/b8/cf/98/25/7c/featured_preview_RPiRack_with_lcd_and_fan.png)
-Your can get the STL File and more details regarding the Hardware here: https://www.thingiverse.com/thing:4879316 (thats the previous version, next is comming soon)
+Your can get the STL File and more details regarding the Hardware here: https://www.printables.com/de/model/258934-raspberry-rack-mount-with-lcd-and-fan (thats the previous version, next is comming soon)
