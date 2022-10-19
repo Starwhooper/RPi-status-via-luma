@@ -10,24 +10,21 @@
 
 ##### check if all required packages are aviable
 try:
- from PIL import ImageFont
+ import datetime
+ import glob
+ import json
+ import netifaces
+ import os
+ import psutil
+ import re
+ import socket
+ import subprocess
+ import sys
+ import time
  from datetime import datetime
  from luma.core.render import canvas
  from pathlib import Path
- import datetime
- import json
- import os
- import psutil
- import socket
- import sys
- import time
- import re
- import subprocess
- import netifaces
- import time
- import os
- import glob
-
+ from PIL import ImageFont
 except:
  sys.exit("\033[91m {}\033[00m" .format('any needed package is not aviable. Please check README.md to check which components shopuld be installed via pip3".'))
 
