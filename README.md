@@ -25,7 +25,7 @@ sudo sed -i -e 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/config.txt
 
 ### install required components
 ```bash
-sudo apt install python3-pip git -y
+sudo apt install python3-pip libopenjp2-7 git -y
 sudo pip3 install luma.lcd json psutil
 sudo git clone https://github.com/rm-hull/luma.examples /opt/luma.examples
 ```
