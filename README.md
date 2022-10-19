@@ -32,19 +32,19 @@ sudo git clone https://github.com/rm-hull/luma.examples /opt/luma.examples
 ```
 and this tool itself:
 ```bash
-sudo git clone https://github.com/Starwhooper/RPi-status-on-luma /opt/RPi-status-on-luma
+sudo git clone https://github.com/Starwhooper/RPi-status-via-luma /opt/RPi-status-via-luma
 ```
 
 ## Start ##
 add it to rc.local to autostart as boot
 ```bash
-sudo sed -i -e '$i \python3 /opt/RPi-status-on-luma/status.py --rotate 3 --config /opt/luma.examples/conf/st7735.conf &\n' /etc/rc.local
+sudo sed -i -e '$i \python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.examples/conf/st7735.conf &\n' /etc/rc.local
 ```
 
 ## Update ##
 If you already use it, feel free to update with
 ```bash
-cd /opt/RPi-status-on-luma
+cd /opt/RPi-status-via-luma
 sudo git pull origin main
 ```
 
