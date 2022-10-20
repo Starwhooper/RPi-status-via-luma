@@ -5,15 +5,10 @@ To provide the Status of your Raspberry (tested on Zero, 2, 3 and 4) to an ST773
 I use this script to get a quick and up-to-date status of the system every time I walk past my Raspberry Pis.
 In this way I can see at a glance the current workload, whether problems are looming and whether the service is currently running.
 
-My Raspberrys are mounted in my 19Rack:
-![Raspberry Pis im Rack](https://github.com/Starwhooper/RPi-status-on-OLED/blob/main/examples/raspberrysinrack.jpg)
+My Raspberrys prepared to mounted in my 19Rack:
+![Raspberry Pis im Rack](https://github.com/Starwhooper/RPi-status-via-luma/blob/main/examples/display.jpg)
 
 Please also note my previous solution based on Wireshark 144: https://github.com/Starwhooper/RPi-status-on-OLED
-## Example ##
-
-![Display](https://github.com/Starwhooper/RPi-status-on-OLED/blob/main/examples/before_2020-09.png)
-![Display](https://github.com/Starwhooper/RPi-status-on-OLED/blob/main/examples/before_2021-06.png)
-![Display](https://github.com/Starwhooper/RPi-status-on-OLED/blob/main/examples/newest.png)
 
 ## Installation ##
 install all needed packages to prepare the software environtent of your Raspberry Pi:
