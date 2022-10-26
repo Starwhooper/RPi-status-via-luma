@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # Creator: Thiemo Schuff, thiemo@schuff.eu
-# Source: https://github.com/Starwhooper/RPi-status-on-luna
+# Source: https://github.com/Starwhooper/RPi-status-via-luna
 
 #######################################################
 #
@@ -52,16 +52,6 @@ except:
  sys.exit("\033[91m {}\033[00m" .format('file ' + cf['luma']['demo_opts.py']['folder'] + '/demo_opts.py not found. Please check config.json or do sudo git clone https://github.com/rm-hull/luma.examples /opt/luma.examples'))
 
 ###### set defaults
-### font
-try:
- if (cf['font']['default'] == True):
-  ft = ImageFont.load_default()
-  ft2 = ImageFont.load_default()
- elif (cf['font']['default'] == False):
-  ft = ImageFont.truetype(cf['font']['ttffile'], cf['font']['size1'])
-  ft2 = ImageFont.truetype(cf['font']['ttffile'], round(cf['font']['size2']))
-except:
- sys.exit("\033[91m {}\033[00m" .format('exit: The configuration file ' + os.path.split(os.path.abspath(__file__))[0] + '/config.json does not provide cf[font][default], cf[font][ttffile] or cf[font][size]. Please rename the file config.json.example to config.json and change the content as required '))
 ###alerts
 #lastmessage=0 
 #alert=''
@@ -78,17 +68,28 @@ def stats(device):
   #check all components
   for componentname in cf["components"]:
    if componentname == 'currentdatetime': 
-       draw.text((0,y), datetime.date.today().strftime('%a')[:2] + "," + datetime.date.today().strftime('%d.%b\'%y') + " " + time.strftime('%H:%M:%S', time.localtime()) , font=ft, fill = cf["fontcolor"])
+       draw.text((0,y), datetime.date.today().strftime('%a')[:2] + "," + datetime.date.today().strftime('%d.%b\'%y') + " " + time.strftime('%H:%M:%S', time.localtime()), fill = cf["fontcolor"])
        y=y+10
   
    elif componentname == 'hostname':
-       draw.text((0,y), str(socket.gethostname()).upper(), font=ft2, fill="yellow")
-       y=y+14
+       ### font
+       try:
+        if (cf['component_hostname']['font']['default'] == True):
+         hostname_font = ImageFont.load_default()
+        elif (cf['component_hostname']['font']['default'] == False):
+         hostname_font = ImageFont.truetype(cf['component_hostname']['font']['ttffile'], cf['component_hostname']['font']['size'])
+       except:
+        sys.exit("\033[91m {}\033[00m" .format('exit: The configuration file ' + os.path.split(os.path.abspath(__file__))[0] + '/config.json does not provide cf[font][default], cf[font][ttffile] or cf[font][size]. Please rename the file config.json.example to config.json and change the content as required '))
+
+       text_x = (device.width - draw.textbbox(xy=(0,0), text=str(socket.gethostname()).upper(), font=hostname_font)[2]) / 2
+       text_y = draw.textbbox(xy=(0,0), text=str(socket.gethostname()).upper(), font=hostname_font)[3]
+       draw.text((text_x,y), str(socket.gethostname()).upper(), font=hostname_font, fill="yellow")
+       y=y+text_y
   
    elif componentname == 'temperatur':
        tFile = open('/sys/class/thermal/thermal_zone0/temp')
        temp = int(format(int(float(tFile.read())/1000),"d"))
-       draw.text((0,y), "Temp", font=ft, fill = cf["fontcolor"])
+       draw.text((0,y), "Temp", fill = cf["fontcolor"])
        width = (cf['display']['width'] - 1 - cf["boxmarginleft"]) / (90 - 30) * (temp - 30)
        fontcolor = cf['fontcolor']
        if width < 0: width = 0
@@ -98,7 +99,7 @@ def stats(device):
        if fillcolor == 'YELLOW': fontcolor = 'GREY'
        draw.rectangle((cf["boxmarginleft"], y) + (cf["boxmarginleft"] + width, y + 10), fill=fillcolor, width=0)
        draw.rectangle((cf["boxmarginleft"], y) + (cf['display']['width']-1, y + 10), outline=cf['fontcolor'], width=1)
-       draw.text((70,y), str(temp) + '°C' , font=ft, fill = fontcolor)
+       draw.text((70,y), str(temp) + '°C' , fill = fontcolor)
        y=y+10
                   
    elif componentname == 'board':
@@ -115,8 +116,8 @@ def stats(device):
         output = output.replace("  ", " ")
         output = re.sub('[^a-zA-Z0-9.+ ]+', '', output)
         piboardinformation = output
-       draw.text((0,y), "Brd", font=ft, fill = cf["fontcolor"])
-       draw.text((cf["boxmarginleft"],y), piboardinformation, font=ft, fill = cf["fontcolor"])
+       draw.text((0,y), "Brd", fill = cf["fontcolor"])
+       draw.text((cf["boxmarginleft"],y), piboardinformation, fill = cf["fontcolor"])
        y=y+10
        
    elif componentname == 'uptime':
@@ -127,13 +128,13 @@ def stats(device):
         elif seconds < (3600*24*7): return "%.1f days" % (seconds/float(3600*24))
         else: return "%.1f Weeks" % (seconds/float(3600*24*7))
        
-       draw.text((0,y), "uptm", font=ft, fill = cf["fontcolor"])
-       draw.text((cf["boxmarginleft"],y), formatTimeAgo(time.time() - psutil.boot_time()) , font=ft, fill = cf["fontcolor"])
+       draw.text((0,y), "uptm", fill = cf["fontcolor"])
+       draw.text((cf["boxmarginleft"],y), formatTimeAgo(time.time() - psutil.boot_time()), fill = cf["fontcolor"])
        y=y+10
    
    elif componentname == 'cpu':
        usage = int(float(psutil.cpu_percent()))
-       draw.text((0,y), "CPU", font=ft, fill = cf["fontcolor"])
+       draw.text((0,y), "CPU", fill = cf["fontcolor"])
        width = (cf['display']['width'] - 1 - cf["boxmarginleft"] ) /100 * usage
        fontcolor = cf['fontcolor']
        if usage >= 80: fillcolor = 'RED'
@@ -142,14 +143,14 @@ def stats(device):
        if fillcolor == 'YELLOW': fontcolor = 'GREY'
        draw.rectangle((cf["boxmarginleft"], y) + (cf["boxmarginleft"] + width, y + 10), fill=fillcolor, width=0)
        draw.rectangle((cf["boxmarginleft"], y) + (cf['display']['width']-1, y + 10), outline=cf['fontcolor'], width=1)
-       draw.text((70,y), str(usage) + "%", font=ft, fill = fontcolor)
+       draw.text((70,y), str(usage) + "%", fill = fontcolor)
        y=y+10
        
    elif componentname == 'os':
        debianversionfile = open('/etc/debian_version','r')
        debianversion = debianversionfile.read()
-       draw.text((0,y), "OS", font=ft, fill = cf["fontcolor"])
-       draw.text((cf["boxmarginleft"],y), debianversion, font=ft, fill = cf["fontcolor"])
+       draw.text((0,y), "OS", fill = cf["fontcolor"])
+       draw.text((cf["boxmarginleft"],y), debianversion, fill = cf["fontcolor"])
        y=y+10
   
    elif componentname == 'ram':
@@ -158,7 +159,7 @@ def stats(device):
        usagemem = round((psutil.virtual_memory()[0] - psutil.virtual_memory()[1]) / 1000 ** 2)
        usageratemem = psutil.virtual_memory()[2]
        usagerategpuram = 100 / (totalmem + gpuram) * gpuram
-       draw.text((0,y), "RAM", font=ft, fill = cf["fontcolor"])
+       draw.text((0,y), "RAM", fill = cf["fontcolor"])
        width = (cf['display']['width'] - 1 - cf["boxmarginleft"]) /100 * usageratemem
        gpuwidth = (cf['display']['width'] - 1 - cf["boxmarginleft"]) /100 * usagerategpuram
        fontcolor = cf['fontcolor']
@@ -171,7 +172,7 @@ def stats(device):
        draw.rectangle((cf['display']['width']-1-gpuwidth, y + 4) + (cf['display']['width']-1, y + 6), fill='GREEN', width=1)
        draw.rectangle((cf['display']['width']-1-gpuwidth, y + 7) + (cf['display']['width']-1, y + 10), fill='BLUE', width=1)
        draw.rectangle((cf["boxmarginleft"], y) + (cf['display']['width']-1, y + 10), outline=cf['fontcolor'], width=1)
-       draw.text((40,y), str(usagemem) + "+" + str(gpuram) + "/" + str(totalmem) + "MB", font=ft, fill = fontcolor)
+       draw.text((40,y), str(usagemem) + "+" + str(gpuram) + "/" + str(totalmem) + "MB", fill = fontcolor)
        y=y+10
   
    elif componentname == 'ipping':
@@ -199,10 +200,10 @@ def stats(device):
         if os.system("ping -c 1 -W 1 " + remotepingdestination + ">/dev/null") == 0: pinginternetcolor = 'GREEN'
         else: pinginternetcolor = 'RED'
         lastping = int(time.time())
-       draw.text((0,y), "IP", font=ft, fill = cf["fontcolor"])
-       draw.text((0,y), "  L", font=ft, fill = pinglocalcolor)
-       draw.text((0,y), "   R", font=ft, fill = pinginternetcolor)
-       draw.text((cf["boxmarginleft"],y), ip , font=ft, fill = cf["fontcolor"])
+       draw.text((0,y), "IP", fill = cf["fontcolor"])
+       draw.text((0,y), "  L", fill = pinglocalcolor)
+       draw.text((0,y), "   R", fill = pinginternetcolor)
+       draw.text((cf["boxmarginleft"],y), ip , fill = cf["fontcolor"])
        draw.rectangle((0, y + 11) + (int( cf['display']['width'] / cf["component_ipping"]["pingintervall"] * (int(time.time()) - lastping)), y + 12), fill="GREEN", width=1)
        y=y+12
       
@@ -215,22 +216,22 @@ def stats(device):
       
        checkforlatestfile = str(cf["component_lastbackupimage"]["checkforlatestfile"]).replace("%HOSTNAME%", str(hostname).lower())
        list_of_files = glob.glob(checkforlatestfile)
-       draw.text((0 ,y), 'Bkp', font=ft, fill = cf["fontcolor"])
+       draw.text((0 ,y), 'Bkp', fill = cf["fontcolor"])
        if len(list_of_files) == 0:
-        draw.text((cf["boxmarginleft"],y), 'missed', font=ft, fill = 'RED')
+        draw.text((cf["boxmarginleft"],y), 'missed', fill = 'RED')
        else:
         latest_file = max(list_of_files, key=os.path.getctime)
         latest_file_name = os.path.basename(latest_file)
-        draw.text((cf["boxmarginleft"],y), latest_file_name, font=ft, fill = cf["fontcolor"])
+        draw.text((cf["boxmarginleft"],y), latest_file_name, fill = cf["fontcolor"])
        y=y+10
       
    elif componentname == 'helloworld':
-        draw.text((0,y), 'Hello World' , font=ft, fill = 'YELLOW')
+        draw.text((0,y), 'Hello World', fill = 'YELLOW')
         y=y+10
         
    elif componentname == 'version':
-       draw.text((0,y), "Scpt", font=ft, fill = cf["fontcolor"])
-       draw.text((cf["boxmarginleft"],y), re.sub('[^0-9\-]+', '', str(subprocess.check_output('git -C ' + os.path.split(os.path.abspath(__file__))[0] + ' show -s --format=%cd --date=format:\'%y%m%d-%H%M\'', shell=True))), font=ft, fill = cf["fontcolor"])
+       draw.text((0,y), "Scpt", fill = cf["fontcolor"])
+       draw.text((cf["boxmarginleft"],y), re.sub('[^0-9\-]+', '', str(subprocess.check_output('git -C ' + os.path.split(os.path.abspath(__file__))[0] + ' show -s --format=%cd --date=format:\'%y%m%d-%H%M\'', shell=True))), fill = cf["fontcolor"])
        y=y+10
   
    elif componentname == 'drives':
@@ -248,7 +249,7 @@ def stats(device):
          usagesdpercent = 100 / totalsd * usagesd
        
          usagesd = round(usagesd / (1024.0 ** 3),1)
-         draw.text((0,(drivenumber+1)*y), "Drv" + str(drivenumber) , font=ft, fill = cf["fontcolor"])
+         draw.text((0,(drivenumber+1)*y), "Drv" + str(drivenumber), fill = cf["fontcolor"])
        
          width = (cf['display']['width'] - 1 - cf["boxmarginleft"]) /100 * usagesdpercent
          fontcolor = cf['fontcolor']
@@ -259,7 +260,7 @@ def stats(device):
          else: fillcolor = 'GREEN'
          draw.rectangle((cf["boxmarginleft"], (drivenumber+1)*y) + (cf["boxmarginleft"] + width, (drivenumber+1)*y + 10), fill=fillcolor, width=0)
          draw.rectangle((cf["boxmarginleft"], (drivenumber+1)*y) + (cf['display']['width']-1, (drivenumber+1)*y + 10), outline=cf['fontcolor'], width=1)
-         draw.text((35,(drivenumber+1)*y), str(usagesd) + "/" + str(round(totalsd / 1024.0 ** 3,1)) + "GB", font=ft, fill = fontcolor)
+         draw.text((35,(drivenumber+1)*y), str(usagesd) + "/" + str(round(totalsd / 1024.0 ** 3,1)) + "GB", fill = fontcolor)
          drivenumber = drivenumber + 1
          if usagesdpercent >= 80:
           alert = '<b>' + drive + '</b>: <font color="' + fillcolor + '">' + str(round(usagesdpercent)) + '%</font> ' + str(usagesd) + ' GB used'
@@ -268,7 +269,7 @@ def stats(device):
         y=y+10                
         
    else:
-        draw.text((0,y), 'unknown component' , font=ft, fill = 'RED')
+        draw.text((0,y), 'unknown component', fill = 'RED')
         y=y+10
    
    if len(alert) >= 1:
