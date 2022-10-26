@@ -35,7 +35,7 @@
    "component_hostname": {
     "font": {
       "default": false,
-      "ttffile": "/opt/luma.examples/examples/fonts/FreePixel.ttf",
+      "ttffile": "/opt/luma.examples/examples/fonts/code2000.ttf",
       "size": 16
     }
    },
