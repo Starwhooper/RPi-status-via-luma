@@ -32,11 +32,12 @@
          "/"
       ]
    },
-   "font":{
-      "default":false,
-      "ttffile":"/opt/luma.examples/examples/fonts/FreePixel.ttf",
-      "size1":12,
-      "size2":16
+   "component_hostname": {
+    "font": {
+      "default": false,
+      "ttffile": "/opt/luma.examples/examples/fonts/FreePixel.ttf",
+      "size": 16
+    }
    },
    "component_ipping":{
       "localpingdestination":"",
