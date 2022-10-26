@@ -110,9 +110,10 @@ def stats(device):
         fobj.close()
         output = output.replace("Raspberry Pi ", "RPi ")
         output = output.replace(" Model ", "")
+        output = output.replace(" Plus", "+")
         output = output.replace("Rev ", "")
         output = output.replace("  ", " ")
-        output = re.sub('[^a-zA-Z0-9. ]+', '', output)
+        output = re.sub('[^a-zA-Z0-9.+ ]+', '', output)
         piboardinformation = output
        draw.text((0,y), "Brd", font=ft, fill = cf["fontcolor"])
        draw.text((cf["boxmarginleft"],y), piboardinformation, font=ft, fill = cf["fontcolor"])
