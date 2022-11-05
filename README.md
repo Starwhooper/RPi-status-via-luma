@@ -55,14 +55,15 @@ sudo git pull origin main
 I used this 1.8" OLED screen: https://www.az-delivery.de/collections/displays/products/1-8-zoll-spi-tft-display
 
 wires:
-* RESET -> GPIO24 = Pin 18
-* A0    -> GPIO23 = Pin 16
 * LED   -> GPIO18 = Pin 12
-* VCC   -> 5V
-* GND   -> Ground
 * SCK   -> Pin 23
 * SDA   -> Pin 19
+* A0    -> GPIO23 = Pin 16
+* RESET -> GPIO24 = Pin 18
 * CS    -> CE0 = Pin 24
+* GND   -> Ground
+* VCC   -> 5V
+(i recommend using https://pinout.xyz/# as reverence)
 
 ### Case ###
 ![Display](https://cdn.thingiverse.com/assets/b8/cf/98/25/7c/featured_preview_RPiRack_with_lcd_and_fan.png)
