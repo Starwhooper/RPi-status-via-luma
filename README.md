@@ -13,9 +13,11 @@ Please also note my previous solution based on Wireshark 144: https://github.com
 ## Installation
 install all needed packages to prepare the software environtent of your Raspberry Pi:
 
-### enable SPI
+### enable SPI or I2C
+(choose one of the two commands in depends of the interface of your display)
 ```bash
 sudo sed -i -e 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/config.txt
+sudo sed -i -e 's/#dtparam=i2c_arm=on/dtparam=i2c_arm=on/g' /boot/config.txt
 ```
 will take effect after bext reboot
 
@@ -44,6 +46,10 @@ in case of 1.8" OLED:
 ```bash
 sudo sed -i -e '$i \python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.examples/conf/st7735.conf &\n' /etc/rc.local
 ```
+in case of 0.91" OLED:
+```bash
+sudo sed -i -e '$i \python3 /opt/RPi-status-via-luma/status.py  -d ssd1306 --height 32 &\n' /etc/rc.local
+```
 
 in case of 1.44" Waveshare:
 ```bash
@@ -62,7 +68,7 @@ sudo git pull origin main
 i recommend using https://pinout.xyz/# as reverence
 
 #### 1.8" OLED
-https://www.az-delivery.de/collections/displays/products/1-8-zoll-spi-tft-display
+https://www.az-delivery.de/en/products/1-8-zoll-spi-tft-display
 
 connections:
 | Display Pin | Raspberry Pin |
@@ -75,6 +81,19 @@ connections:
 | CS | CE0 = Pin 24 |
 | GND | Ground |
 | VCC | 5V |
+
+
+#### 0.91" OLED
+https://www.az-delivery.de/en/products/0-91-zoll-i2c-oled-display
+
+connections:
+| Display Pin | Raspberry Pin |
+|---|---|
+| GND | Ground |
+| VCC | 3.3V |
+| SCL | I2C1 SCL = Pin 5 |
+| SDA | I2C1 SDA = Pin 3 |
+
 
 #### 1.44" Waveshare
 https://www.waveshare.com/wiki/1.44inch_LCD_HAT
