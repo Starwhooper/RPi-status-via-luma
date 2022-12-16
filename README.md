@@ -6,7 +6,7 @@ I use this script to get a quick and up-to-date status of the system every time 
 In this way I can see at a glance the current workload, whether problems are looming and whether the service is currently running.
 
 My Raspberrys prepared to mounted in my 19Rack:
-![Raspberry Pis im Rack](https://github.com/Starwhooper/RPi-status-via-luma/blob/main/examples/display.jpg)
+![Raspberry Pis im Rack](https://media.printables.com/media/prints/300085/images/2715870_a53f284c-180c-4feb-9401-bd60474f65ca/thumbs/inside/1920x1440/jpg/img20221108094538.webp)
 
 Please also note my previous solution based on Wireshark 144: https://github.com/Starwhooper/RPi-status-on-OLED
 
