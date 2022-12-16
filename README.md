@@ -84,9 +84,9 @@ connections:
 |---|---|
 | Display Pin 1 | Raspberry 3.3V |
 | Display Pin 6 | Raspberry Ground Pin |
-| Display Pin 13 | Raspberry Pin 18 |
+| Display **Pin 13** | Raspberry **Pin 18** |
 | Display Pin 19 | Raspberry Pin 19 |
-| Display Pin 22 | Raspberry Pin 16 |
+| Display **Pin 22** | Raspberry **Pin 16** |
 | Display Pin 23 | Raspberry Pin 23 |
 | Display Pin 24 | Raspberry Pin 24 |
 
