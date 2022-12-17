@@ -75,14 +75,23 @@ def stats(device):
  lastmessage=0 
  alert=''
  with canvas(device) as draw:
-  #reset values
-  y=1
-#  overallhight=0
+  global whole_y
+  global offset_y
+  
+  try: whole_y
+  except: whole_y = 0
 
-  rectangle_y = draw.textbbox(xy=(0,0), text='Aj', font=font)[3]
+  if whole_y >= device.height: 
+   try: offset_y = offset_y -1  
+   except: offset_y = 0
+  else: offset_y = 0
+  y=1 + offset_y
+
+  rectangle_y = draw.textbbox(xy=(0,0), text='AQjgp,;Ä', font=font)[3]
   
   #check all components
   for componentname in cf['components']:
+  
    if componentname == 'currentdatetime': 
        draw.text((0,y), datetime.date.today().strftime('%a')[:2] + ',' + datetime.date.today().strftime('%d.%b\'%y') + ' ' + time.strftime('%H:%M:%S', time.localtime()), font = font, fill = cf['font']['color'])
        y=y+cf['linefeed']
@@ -237,6 +246,9 @@ def stats(device):
       
    elif componentname == 'helloworld':
         draw.text((0,y), 'Hello World', font = font, fill = 'Yellow')
+        y=y+cf['linefeed']   
+   elif componentname == 'empty':
+        draw.text((0,y), '', font = font, fill = 'Yellow')
         y=y+cf['linefeed']
         
    elif componentname == 'version':
@@ -296,8 +308,7 @@ def stats(device):
      )
      lastmessage = time.time()
      alert=''
-   
-
+  whole_y = y
 
 def main():
     while True:
