@@ -13,6 +13,7 @@
       "ttfsize": 6
    },
    "imagerefresh":0.2,
+   "linefeed":10;
    "components":[
       "hostname",
       "currentdatetime",
