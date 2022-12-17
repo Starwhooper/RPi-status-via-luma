@@ -6,7 +6,12 @@
    },
    "backgroundcolor":"BLACK",
    "boxmarginleft":27,
-   "fontcolor":"WHITE",
+   "font": {
+      "color": "WHITE",
+      "ttf": false,
+      "ttffile": "/opt/luma.examples/examples/fonts/tiny.ttf",
+      "ttfsize": 6
+   },
    "imagerefresh":0.2,
    "components":[
       "hostname",
