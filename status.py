@@ -51,6 +51,14 @@ try:
 except:
  sys.exit("\033[91m {}\033[00m" .format('file ' + cf['luma']['demo_opts.py']['folder'] + '/demo_opts.py not found. Please check config.json or do sudo git clone https://github.com/rm-hull/luma.examples /opt/luma.examples'))
 
+######own functions
+def valuetocolor(value,translation):
+ for t in translation:
+    if value >= t[0]:
+        color = t[1]
+        break;
+ return(color)
+
 ###### set defaults
 ###alerts
 #lastmessage=0 
@@ -83,7 +91,7 @@ def stats(device):
 
        text_x = (device.width - draw.textbbox(xy=(0,0), text=str(socket.gethostname()).upper(), font=hostname_font)[2]) / 2
        text_y = draw.textbbox(xy=(0,0), text=str(socket.gethostname()).upper(), font=hostname_font)[3]
-       draw.text((text_x,y), str(socket.gethostname()).upper(), font=hostname_font, fill='yellow')
+       draw.text((text_x,y), str(socket.gethostname()).upper(), font=hostname_font, fill='Yellow')
        y=y+text_y
   
    elif componentname == 'temperatur':
@@ -93,10 +101,8 @@ def stats(device):
        width = (device.width - 1 - cf['boxmarginleft']) / (90 - 30) * (temp - 30)
        fontcolor = cf['font']['color']
        if width < 0: width = 0
-       if temp >= 70: fillcolor = 'RED'
-       elif temp >= 60: fillcolor = 'YELLOW'
-       else: fillcolor = 'GREEN'
-       if fillcolor == 'YELLOW': fontcolor = 'GREY'
+       fillcolor = valuetocolor(temp,[[70,"Red"],[60,"Yellow"],[0,"Green"]])
+       if fillcolor == 'Yellow': fontcolor = 'Gray'
        draw.rectangle((cf['boxmarginleft'], y) + (cf['boxmarginleft'] + width, y + 10), fill=fillcolor, width=0)
        draw.rectangle((cf['boxmarginleft'], y) + (device.width-1, y + 10), outline=cf['font']['color'], width=1)
        draw.text((70,y), str(temp) + '°C' , fill = fontcolor)
@@ -137,10 +143,8 @@ def stats(device):
        draw.text((0,y), 'CPU', fill = cf['font']['color'])
        width = (device.width - 1 - cf['boxmarginleft'] ) /100 * usage
        fontcolor = cf['font']['color']
-       if usage >= 80: fillcolor = 'RED'
-       elif usage >= 60: fillcolor = 'YELLOW'
-       else: fillcolor = 'GREEN'
-       if fillcolor == 'YELLOW': fontcolor = 'GREY'
+       fillcolor = valuetocolor(usage,[[80,"Red"],[60,"Yellow"],[0,"Green"]])
+       if fillcolor == 'Yellow': fontcolor = 'Grey'
        draw.rectangle((cf['boxmarginleft'], y) + (cf['boxmarginleft'] + width, y + 10), fill=fillcolor, width=0)
        draw.rectangle((cf['boxmarginleft'], y) + (device.width-1, y + 10), outline=cf['font']['color'], width=1)
        draw.text((70,y), str(usage) + '%', fill = fontcolor)
@@ -163,14 +167,12 @@ def stats(device):
        width = (device.width - 1 - cf['boxmarginleft']) /100 * usageratemem
        gpuwidth = (device.width - 1 - cf['boxmarginleft']) /100 * usagerategpuram
        fontcolor = cf['font']['color']
-       if usageratemem >= 80: fillcolor = 'RED'
-       elif usageratemem >= 60: fillcolor = 'YELLOW'
-       else: fillcolor = 'GREEN'
-       if fillcolor == 'YELLOW': fontcolor = 'GREY'
+       fillcolor = valuetocolor(usageratemem,[[80,"Red"],[60,"Yellow"],[0,"Green"]])
+       if fillcolor == 'Yellow': fontcolor = 'Grey'
        draw.rectangle((cf['boxmarginleft'], y) + (cf['boxmarginleft'] + width, y + 10), fill=fillcolor, width=0)
-       draw.rectangle((device.width-1-gpuwidth, y) + (device.width-1, y + 3), fill='RED', width=1)
-       draw.rectangle((device.width-1-gpuwidth, y + 4) + (device.width-1, y + 6), fill='GREEN', width=1)
-       draw.rectangle((device.width-1-gpuwidth, y + 7) + (device.width-1, y + 10), fill='BLUE', width=1)
+       draw.rectangle((device.width-1-gpuwidth, y) + (device.width-1, y + 3), fill='Red', width=1)
+       draw.rectangle((device.width-1-gpuwidth, y + 4) + (device.width-1, y + 6), fill='Green', width=1)
+       draw.rectangle((device.width-1-gpuwidth, y + 7) + (device.width-1, y + 10), fill='Blue', width=1)
        draw.rectangle((cf['boxmarginleft'], y) + (device.width-1, y + 10), outline=cf['font']['color'], width=1)
        draw.text((40,y), str(usagemem) + '+' + str(gpuram) + '/' + str(totalmem) + 'MB', fill = fontcolor)
        y=y+10
@@ -195,16 +197,16 @@ def stats(device):
        global pinginternetcolor
       
        if time.time() >= lastping + cf['component_ipping']['pingintervall']: #Ping systems all x seconds
-        if os.system('ping -c 1 -W 1 ' + localpingdestination + '>/dev/null') == 0: pinglocalcolor = 'GREEN'
-        else: pinglocalcolor = 'RED'
-        if os.system('ping -c 1 -W 1 ' + remotepingdestination + '>/dev/null') == 0: pinginternetcolor = 'GREEN'
-        else: pinginternetcolor = 'RED'
+        if os.system('ping -c 1 -W 1 ' + localpingdestination + '>/dev/null') == 0: pinglocalcolor = 'Green'
+        else: pinglocalcolor = 'Red'
+        if os.system('ping -c 1 -W 1 ' + remotepingdestination + '>/dev/null') == 0: pinginternetcolor = 'Green'
+        else: pinginternetcolor = 'Red'
         lastping = int(time.time())
        draw.text((0,y), 'IP', fill = cf['font']['color'])
        draw.text((0,y), '  L', fill = pinglocalcolor)
        draw.text((0,y), '   R', fill = pinginternetcolor)
        draw.text((cf['boxmarginleft'],y), ip , fill = cf['font']['color'])
-       draw.rectangle((0, y + 11) + (int( device.width / cf['component_ipping']['pingintervall'] * (int(time.time()) - lastping)), y + 12), fill='GREEN', width=1)
+       draw.rectangle((0, y + 11) + (int( device.width / cf['component_ipping']['pingintervall'] * (int(time.time()) - lastping)), y + 12), fill='Green', width=1)
        y=y+12
       
    elif componentname == 'lastbackupimage':
@@ -218,7 +220,7 @@ def stats(device):
        list_of_files = glob.glob(checkforlatestfile)
        draw.text((0 ,y), 'Bkp', fill = cf['font']['color'])
        if len(list_of_files) == 0:
-        draw.text((cf['boxmarginleft'],y), 'missed', fill = 'RED')
+        draw.text((cf['boxmarginleft'],y), 'missed', fill = 'Red')
        else:
         latest_file = max(list_of_files, key=os.path.getctime)
         latest_file_name = os.path.basename(latest_file)
@@ -226,7 +228,7 @@ def stats(device):
        y=y+10
       
    elif componentname == 'helloworld':
-        draw.text((0,y), 'Hello World', fill = 'YELLOW')
+        draw.text((0,y), 'Hello World', fill = 'Yellow')
         y=y+10
         
    elif componentname == 'version':
@@ -253,11 +255,8 @@ def stats(device):
        
          width = (device.width - 1 - cf['boxmarginleft']) /100 * usagesdpercent
          fontcolor = cf['font']['color']
-         if usagesdpercent >= 90: fillcolor = 'RED'
-         elif usagesdpercent >= 70:
-          fillcolor = 'YELLOW'
-          fontcolor = 'GRAY'
-         else: fillcolor = 'GREEN'
+         fillcolor = valuetocolor(usagesdpercent,[[90,"Red"],[70,"Yellow"],[0,"Green"]])
+         if fillcolor == 'Yellow': fontcolor = 'Grey'
          draw.rectangle((cf['boxmarginleft'], (drivenumber+1)*y) + (cf['boxmarginleft'] + width, (drivenumber+1)*y + 10), fill=fillcolor, width=0)
          draw.rectangle((cf['boxmarginleft'], (drivenumber+1)*y) + (device.width-1, (drivenumber+1)*y + 10), outline=cf['font']['color'], width=1)
          draw.text((35,(drivenumber+1)*y), str(usagesd) + '/' + str(round(totalsd / 1024.0 ** 3,1)) + 'GB', fill = fontcolor)
