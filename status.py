@@ -90,7 +90,7 @@ def stats(device):
        tFile = open('/sys/class/thermal/thermal_zone0/temp')
        temp = int(format(int(float(tFile.read())/1000),"d"))
        draw.text((0,y), "Temp", fill = cf["fontcolor"])
-       width = (cf['display']['width'] - 1 - cf["boxmarginleft"]) / (90 - 30) * (temp - 30)
+       width = (device.width - 1 - cf["boxmarginleft"]) / (90 - 30) * (temp - 30)
        fontcolor = cf['fontcolor']
        if width < 0: width = 0
        if temp >= 70: fillcolor = 'RED'
@@ -98,7 +98,7 @@ def stats(device):
        else: fillcolor = 'GREEN'
        if fillcolor == 'YELLOW': fontcolor = 'GREY'
        draw.rectangle((cf["boxmarginleft"], y) + (cf["boxmarginleft"] + width, y + 10), fill=fillcolor, width=0)
-       draw.rectangle((cf["boxmarginleft"], y) + (cf['display']['width']-1, y + 10), outline=cf['fontcolor'], width=1)
+       draw.rectangle((cf["boxmarginleft"], y) + (device.width-1, y + 10), outline=cf['fontcolor'], width=1)
        draw.text((70,y), str(temp) + '°C' , fill = fontcolor)
        y=y+10
                   
@@ -135,14 +135,14 @@ def stats(device):
    elif componentname == 'cpu':
        usage = int(float(psutil.cpu_percent()))
        draw.text((0,y), "CPU", fill = cf["fontcolor"])
-       width = (cf['display']['width'] - 1 - cf["boxmarginleft"] ) /100 * usage
+       width = (device.width - 1 - cf["boxmarginleft"] ) /100 * usage
        fontcolor = cf['fontcolor']
        if usage >= 80: fillcolor = 'RED'
        elif usage >= 60: fillcolor = 'YELLOW'
        else: fillcolor = 'GREEN'
        if fillcolor == 'YELLOW': fontcolor = 'GREY'
        draw.rectangle((cf["boxmarginleft"], y) + (cf["boxmarginleft"] + width, y + 10), fill=fillcolor, width=0)
-       draw.rectangle((cf["boxmarginleft"], y) + (cf['display']['width']-1, y + 10), outline=cf['fontcolor'], width=1)
+       draw.rectangle((cf["boxmarginleft"], y) + (device.width-1, y + 10), outline=cf['fontcolor'], width=1)
        draw.text((70,y), str(usage) + "%", fill = fontcolor)
        y=y+10
        
@@ -160,18 +160,18 @@ def stats(device):
        usageratemem = psutil.virtual_memory()[2]
        usagerategpuram = 100 / (totalmem + gpuram) * gpuram
        draw.text((0,y), "RAM", fill = cf["fontcolor"])
-       width = (cf['display']['width'] - 1 - cf["boxmarginleft"]) /100 * usageratemem
-       gpuwidth = (cf['display']['width'] - 1 - cf["boxmarginleft"]) /100 * usagerategpuram
+       width = (device.width - 1 - cf["boxmarginleft"]) /100 * usageratemem
+       gpuwidth = (device.width - 1 - cf["boxmarginleft"]) /100 * usagerategpuram
        fontcolor = cf['fontcolor']
        if usageratemem >= 80: fillcolor = 'RED'
        elif usageratemem >= 60: fillcolor = 'YELLOW'
        else: fillcolor = 'GREEN'
        if fillcolor == 'YELLOW': fontcolor = 'GREY'
        draw.rectangle((cf["boxmarginleft"], y) + (cf["boxmarginleft"] + width, y + 10), fill=fillcolor, width=0)
-       draw.rectangle((cf['display']['width']-1-gpuwidth, y) + (cf['display']['width']-1, y + 3), fill='RED', width=1)
-       draw.rectangle((cf['display']['width']-1-gpuwidth, y + 4) + (cf['display']['width']-1, y + 6), fill='GREEN', width=1)
-       draw.rectangle((cf['display']['width']-1-gpuwidth, y + 7) + (cf['display']['width']-1, y + 10), fill='BLUE', width=1)
-       draw.rectangle((cf["boxmarginleft"], y) + (cf['display']['width']-1, y + 10), outline=cf['fontcolor'], width=1)
+       draw.rectangle((device.width-1-gpuwidth, y) + (device.width-1, y + 3), fill='RED', width=1)
+       draw.rectangle((device.width-1-gpuwidth, y + 4) + (device.width-1, y + 6), fill='GREEN', width=1)
+       draw.rectangle((device.width-1-gpuwidth, y + 7) + (device.width-1, y + 10), fill='BLUE', width=1)
+       draw.rectangle((cf["boxmarginleft"], y) + (device.width-1, y + 10), outline=cf['fontcolor'], width=1)
        draw.text((40,y), str(usagemem) + "+" + str(gpuram) + "/" + str(totalmem) + "MB", fill = fontcolor)
        y=y+10
   
@@ -204,7 +204,7 @@ def stats(device):
        draw.text((0,y), "  L", fill = pinglocalcolor)
        draw.text((0,y), "   R", fill = pinginternetcolor)
        draw.text((cf["boxmarginleft"],y), ip , fill = cf["fontcolor"])
-       draw.rectangle((0, y + 11) + (int( cf['display']['width'] / cf["component_ipping"]["pingintervall"] * (int(time.time()) - lastping)), y + 12), fill="GREEN", width=1)
+       draw.rectangle((0, y + 11) + (int( device.width / cf["component_ipping"]["pingintervall"] * (int(time.time()) - lastping)), y + 12), fill="GREEN", width=1)
        y=y+12
       
    elif componentname == 'lastbackupimage':
@@ -251,7 +251,7 @@ def stats(device):
          usagesd = round(usagesd / (1024.0 ** 3),1)
          draw.text((0,(drivenumber+1)*y), "Drv" + str(drivenumber), fill = cf["fontcolor"])
        
-         width = (cf['display']['width'] - 1 - cf["boxmarginleft"]) /100 * usagesdpercent
+         width = (device.width - 1 - cf["boxmarginleft"]) /100 * usagesdpercent
          fontcolor = cf['fontcolor']
          if usagesdpercent >= 90: fillcolor = 'RED'
          elif usagesdpercent >= 70:
@@ -259,7 +259,7 @@ def stats(device):
           fontcolor = 'GRAY'
          else: fillcolor = 'GREEN'
          draw.rectangle((cf["boxmarginleft"], (drivenumber+1)*y) + (cf["boxmarginleft"] + width, (drivenumber+1)*y + 10), fill=fillcolor, width=0)
-         draw.rectangle((cf["boxmarginleft"], (drivenumber+1)*y) + (cf['display']['width']-1, (drivenumber+1)*y + 10), outline=cf['fontcolor'], width=1)
+         draw.rectangle((cf["boxmarginleft"], (drivenumber+1)*y) + (device.width-1, (drivenumber+1)*y + 10), outline=cf['fontcolor'], width=1)
          draw.text((35,(drivenumber+1)*y), str(usagesd) + "/" + str(round(totalsd / 1024.0 ** 3,1)) + "GB", fill = fontcolor)
          drivenumber = drivenumber + 1
          if usagesdpercent >= 80:

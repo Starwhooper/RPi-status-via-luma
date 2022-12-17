@@ -4,10 +4,6 @@
          "folder":"/opt/luma.examples/examples"
       }
    },
-   "display":{
-      "width":128,
-      "height":160
-   },
    "backgroundcolor":"BLACK",
    "boxmarginleft":27,
    "fontcolor":"WHITE",
