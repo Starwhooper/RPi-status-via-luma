@@ -74,7 +74,7 @@ else:
 def stats(device):
  lastmessage=0 
  alert=''
- with canvas(device) as draw:
+  with canvas(device, dither=True) as draw:
   global whole_y
   global offset_y
   
