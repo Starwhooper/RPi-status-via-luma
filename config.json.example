@@ -27,7 +27,8 @@
       "lastbackupimage",
       "os",
       "version",
-      "helloworld"
+      "helloworld",
+      "empty"
    ],
    "component_drive":{
       "drive":[
