@@ -43,6 +43,7 @@ sudo nano /opt/RPi-status-via-luma/config.json
 Check https://github.com/Starwhooper/RPi-status-via-luma/wiki/explain-config.json to get more details about the config.json file
 
 ### add to autostart ###
+
 add it to rc.local to autostart as boot
 in case of 1.8" OLED:
 ```bash
@@ -52,6 +53,7 @@ in case of 0.91" OLED:
 ```bash
 sudo sed -i -e '$i \python3 /opt/RPi-status-via-luma/status.py  -d ssd1306 --height 32 &\n' /etc/rc.local
 ```
+if you get the response _status.py: error: I2C device not found: /dev/i2c-1_ you need to add the parameter --i2c-port 0
 
 in case of 1.44" Waveshare:
 ```bash
