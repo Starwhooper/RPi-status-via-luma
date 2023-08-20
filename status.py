@@ -34,7 +34,7 @@ for p in psutil.process_iter():
  if len(p.cmdline()) == 2:
   if p.cmdline()[0] == '/usr/bin/python3':
    if p.cmdline()[1] == os.path.abspath(__file__):
-    runninginstances = runninginstances + 1
+    runninginstances += 1
 if runninginstances >= 2:
  sys.exit("\033[91m {}\033[00m" .format('exit: is already running'))
  
@@ -99,7 +99,7 @@ def stats(device):
        string = datetime.date.today().strftime('%a')[:2] + ',' + datetime.date.today().strftime('%d.%b\'%y') + ' ' + time.strftime('%H:%M:%S', time.localtime())
        if cf['design'] == 'beauty':
         draw.text((0,y), string, font = font, fill = cf['font']['color'])
-        y=y+cf['linefeed']
+        y += cf['linefeed']
        if cf['design'] == 'terminal':
         term.println('Date: ' + string)
         time.sleep(2)
@@ -118,7 +118,7 @@ def stats(device):
         text_x = (device.width - draw.textbbox(xy=(0,0), text=string, font=hostname_font)[2]) / 2
         text_y = draw.textbbox(xy=(0,0), text=string, font=hostname_font)[3]
         draw.text((text_x,y), string, font=hostname_font, fill='Yellow')
-        y=y+text_y
+        y += text_y
        if cf['design'] == 'terminal':
         term.println('Hostname: ' + string)
         time.sleep(2)
@@ -136,7 +136,7 @@ def stats(device):
         draw.rectangle((cf['boxmarginleft'], y) + (cf['boxmarginleft'] + width, y + rectangle_y), fill=fillcolor, width=0)
         draw.rectangle((cf['boxmarginleft'], y) + (device.width-1, y + rectangle_y), outline=cf['font']['color'], width=1)
         draw.text((70,y), str(temp) + '°C' , font = font, fill = fontcolor)
-        y=y+cf['linefeed']
+        y += cf['linefeed']
        if cf['design'] == 'terminal':
         term.println('Temperature: ' + str(temp) + '°C')
         time.sleep(2)
@@ -146,7 +146,7 @@ def stats(device):
         fobj = open('/sys/firmware/devicetree/base/model')
         output = ''
         for line in fobj:
-           output = output + line.rstrip()
+           output += line.rstrip()
         fobj.close()
         output = output.replace('Raspberry Pi ', 'RPi ')
         output = output.replace(' Model ', '')
@@ -158,7 +158,7 @@ def stats(device):
        if cf['design'] == 'beauty':
         draw.text((0,y), 'Brd', font = font, fill = cf['font']['color'])
         draw.text((cf['boxmarginleft'],y), piboardinformation, font = font, fill = cf['font']['color'])
-        y=y+cf['linefeed']
+        y += cf['linefeed']
        if cf['design'] == 'terminal':
         term.println('Board: ' + piboardinformation)
         time.sleep(2)
@@ -174,7 +174,7 @@ def stats(device):
        if cf['design'] == 'beauty':
         draw.text((0,y), 'uptm', font = font, fill = cf['font']['color'])
         draw.text((cf['boxmarginleft'],y), string, font = font, fill = cf['font']['color'])
-        y=y+cf['linefeed']
+        y += cf['linefeed']
        if cf['design'] == 'terminal':
         term.println('Uptime: ' + string)
         time.sleep(2)
@@ -191,7 +191,7 @@ def stats(device):
         draw.rectangle((cf['boxmarginleft'], y) + (cf['boxmarginleft'] + width, y + rectangle_y), fill=fillcolor, width=0)
         draw.rectangle((cf['boxmarginleft'], y) + (device.width-1, y + rectangle_y), outline=cf['font']['color'], width=1)
         draw.text((70,y), str(usage) + '%', font = font, fill = fontcolor)
-        y=y+cf['linefeed']
+        y += cf['linefeed']
        if cf['design'] == 'terminal':
         term.println('CPU usage: ' + string)
         time.sleep(2)
@@ -202,7 +202,7 @@ def stats(device):
        if cf['design'] == 'beauty':
         draw.text((0,y), 'OS', font = font, fill = cf['font']['color'])
         draw.text((cf['boxmarginleft'],y), debianversion, font = font, fill = cf['font']['color'])
-        y=y+cf['linefeed']
+        y += cf['linefeed']
        if cf['design'] == 'terminal':
         term.println('OS: ' + debianversion)
         time.sleep(2)
@@ -227,7 +227,7 @@ def stats(device):
         draw.rectangle((device.width-1-gpuwidth, y + 7) + (device.width-1, y + rectangle_y), fill='Blue', width=1)
         draw.rectangle((cf['boxmarginleft'], y) + (device.width-1, y + rectangle_y), outline=cf['font']['color'], width=1)
         draw.text((40,y), string, font = font, fill = fontcolor)
-        y=y+cf['linefeed']
+        y += cf['linefeed']
        if cf['design'] == 'terminal':
         term.println('RAM: ' + string)
         time.sleep(2)
@@ -263,7 +263,7 @@ def stats(device):
         draw.text((0,y), '   R', font = font, fill = pinginternetcolor)
         draw.text((cf['boxmarginleft'],y), ip , font = font, fill = cf['font']['color'])
         draw.rectangle((0, y + 11) + (int( device.width / cf['component_ipping']['pingintervall'] * (int(time.time()) - lastping)), y + rectangle_y + 2), fill='Green', width=1)
-        y=y+cf['linefeed']+2
+        y += cf['linefeed']+2
        if cf['design'] == 'terminal':
         term.println('IP: ' + ip)
         time.sleep(2)
@@ -285,7 +285,7 @@ def stats(device):
          latest_file = max(list_of_files, key=os.path.getctime)
          latest_file_name = os.path.basename(latest_file)
          draw.text((cf['boxmarginleft'],y), latest_file_name, font = font, fill = cf['font']['color'])
-        y=y+cf['linefeed']
+        y += cf['linefeed']
        if cf['design'] == 'terminal':
         if len(list_of_files) == 0:
          term.println('backup: no image found')
@@ -299,7 +299,7 @@ def stats(device):
    elif componentname == 'helloworld':
         if cf['design'] == 'beauty':
          draw.text((0,y), 'Hello World', font = font, fill = 'Yellow')
-         y=y+cf['linefeed']   
+         y += cf['linefeed']   
         if cf['design'] == 'terminal':
          term.println('Hello World')
          time.sleep(2)
@@ -307,7 +307,7 @@ def stats(device):
    elif componentname == 'empty':
         if cf['design'] == 'beauty':
          draw.text((0,y), '', font = font, fill = 'Yellow')
-         y=y+cf['linefeed']
+         y += cf['linefeed']
         if cf['design'] == 'terminal':
          term.println()
          time.sleep(2)
@@ -317,7 +317,7 @@ def stats(device):
        if cf['design'] == 'beauty':
         draw.text((0,y), 'Scpt', font = font, fill = cf['font']['color'])
         draw.text((cf['boxmarginleft'],y), string, font = font, fill = cf['font']['color'])
-        y=y+cf['linefeed']
+        y += cf['linefeed']
        if cf['design'] == 'terminal':
         term.println('Version: ' + string)
         time.sleep(2)
@@ -341,32 +341,32 @@ def stats(device):
          string =  str(usagesd) + '/' + str(round(totalsd / 1024.0 ** 3,1)) + 'GB'
          
          if cf['design'] == 'beauty':
-          draw.text((0,(drivenumber+1)*y), 'Drv' + str(drivenumber), font = font, fill = cf['font']['color'])
-        
+          draw.text((0,y), 'Drv' + str(drivenumber), font = font, fill = cf['font']['color'])
           width = (device.width - 1 - cf['boxmarginleft']) /100 * usagesdpercent
           fontcolor = cf['font']['color']
           fillcolor = valuetocolor(usagesdpercent,[[90,"Red"],[70,"Yellow"],[0,"Green"]])
           if fillcolor == 'Yellow': fontcolor = 'Grey'
-          draw.rectangle((cf['boxmarginleft'], (drivenumber+1)*y) + (cf['boxmarginleft'] + width, (drivenumber+1)*y + rectangle_y), fill=fillcolor, width=0)
-          draw.rectangle((cf['boxmarginleft'], (drivenumber+1)*y) + (device.width-1, (drivenumber+1)*y + rectangle_y), outline=cf['font']['color'], width=1)
-          draw.text((35,(drivenumber+1)*y), string, font = font, fill = fontcolor)
-          drivenumber = drivenumber + 1
+          draw.rectangle((cf['boxmarginleft'], y) + (cf['boxmarginleft'] + width, y + rectangle_y), fill=fillcolor, width=0)
+          draw.rectangle((cf['boxmarginleft'], y) + (device.width-1, y + rectangle_y), outline=cf['font']['color'], width=1)
+          draw.text((35,y), string, font = font, fill = fontcolor)
+          drivenumber += 1
           if usagesdpercent >= 80:
            alert = '<b>' + drive + '</b>: <font color="' + fillcolor + '">' + str(round(usagesdpercent)) + '%</font> ' + str(usagesd) + ' GB used'
-          y=y+cf['linefeed']                
+          y += cf['linefeed']                
+          
          if cf['design'] == 'terminal':
           term.println('Drive: ' + drive + ' = ' + str(string))
           time.sleep(2)
         else:
          if cf['design'] == 'beauty':
           print('folder ' + drive + ' not found')
-          y=y+cf['linefeed']                
+          y += cf['linefeed']                
          if cf['design'] == 'terminal':
           term.println('Drive: ' + drive + ' not found')
           time.sleep(2)
    else:
         draw.text((0,y), 'unknown component', font = font, fill = 'RED')
-        y=y+cf['linefeed']
+        y += cf['linefeed']
    
    if len(alert) >= 1:
     if cf['pushover']['messages'] == 1 and time.time() >= lastmessage + 60 * 60 * 24:
