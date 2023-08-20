@@ -76,7 +76,8 @@ def stats(device):
  lastmessage=0 
  alert=''
  with canvas(device, dither=True) as draw:
-  term = terminal(device, font)
+  if cf['design'] == 'terminal':
+   term = terminal(device, font)
   global whole_y
   global offset_y
   
