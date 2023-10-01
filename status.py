@@ -14,7 +14,8 @@ try:
  from luma.core.virtual import terminal
  from pathlib import Path
  from PIL import ImageFont
- import datetime
+ from datetime import datetime, timedelta  
+# import datetime
  import glob
  import json
  import netifaces
@@ -61,8 +62,8 @@ def valuetocolor(value,translation):
  return(color)
 
 ###### set defaults
+hostname = str(socket.gethostname())
 ###alerts
-#lastmessage=0 
 #alert=''
 
 if cf['font']['ttf'] == True:
@@ -73,8 +74,14 @@ else:
 
 ##### do output
 def stats(device):
- lastmessage=0 
- alert=''
+ global lastmessage
+ global alert
+ try: lastmessage
+ except: 
+  alert='maybe restart?'
+  lastmessage = datetime(1977, 1, 1)
+  
+# alert=''
  with canvas(device, dither=True) as draw:
   if cf['design'] == 'terminal':
    term = terminal(device, font)
@@ -96,7 +103,7 @@ def stats(device):
   for componentname in cf['components']:
   
    if componentname == 'currentdatetime': 
-       string = datetime.date.today().strftime('%a')[:2] + ',' + datetime.date.today().strftime('%d.%b\'%y') + ' ' + time.strftime('%H:%M:%S', time.localtime())
+       string = '{:%a,%d.%b\'%y %H:%M:%S}'.format(datetime.now())
        if cf['design'] == 'beauty':
         draw.text((0,y), string, font = font, fill = cf['font']['color'])
         y += cf['linefeed']
@@ -106,7 +113,7 @@ def stats(device):
   
    elif componentname == 'hostname':
        ### font
-       string = str(socket.gethostname()).upper()
+       string = hostname.upper()
        if cf['design'] == 'beauty':
         try:
          if (cf['component_hostname']['font']['default'] == True):
@@ -269,7 +276,7 @@ def stats(device):
         time.sleep(2)
 
    elif componentname == 'lastbackupimage':
-       hostname = str(socket.gethostname()).upper()
+       #hostname = str(socket.gethostname()).upper()
        try: lastimagemarqueepos
        except: lastimagemarqueepos = 0
        try: lastimagemarqueewait
@@ -324,10 +331,7 @@ def stats(device):
   
    elif componentname == 'drives':
        drivenumber = 0
-       
-#       try: lastmessage
-#       except: lastmessage = 0
-       
+      
        for drive in cf['component_drive']['drive']:
         if os.path.isdir(drive):
 #         alert = ''
@@ -369,22 +373,21 @@ def stats(device):
         y += cf['linefeed']
    
    if len(alert) >= 1:
-    if cf['pushover']['messages'] == 1 and time.time() >= lastmessage + 60 * 60 * 24:
+    if cf['pushover']['messages'] == 1 and datetime.now() >= (lastmessage + timedelta(hours=1)):
      import requests
-     r = requests.post('https://api.pushover.net/1/messages.json', data = {
-         "token": cf['pushover']['apikey'],
-         "user": cf['pushover']['userkey'],
-         "html": 1,
-         "priority": 1,
-         "message": hostname + ' ' + alert,
-         }
-     ,
-     files = {
-      "attachment": ("image.png", open(str(cf['savescreen']['destination']).replace('%HOSTNAME%', str(socket.gethostname()).lower()), 'rb'), 'image/png')
-     }
-     )
-     lastmessage = time.time()
-     alert=''
+     try:
+      r = requests.post('https://api.pushover.net/1/messages.json', data = {
+          "token": cf['pushover']['apikey'],
+          "user": cf['pushover']['userkey'],
+          "html": 1,
+          "priority": 1,
+          "message": hostname + ' ' + alert,
+          }
+      )
+      lastmessage = datetime.now()
+      alert=''
+     except:
+      1
   whole_y = y
 
 def main():
