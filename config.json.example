@@ -30,6 +30,9 @@
       "helloworld",
       "empty"
    ],
+   "component_checkmac": {
+    "mac": "00:00:00:00:00:00"
+   },   
    "component_drive":{
       "drive":[
          "/",
