@@ -238,7 +238,18 @@ def stats(device):
        if cf['design'] == 'terminal':
         term.println('RAM: ' + string)
         time.sleep(2)
-        
+
+   elif componentname == 'checkmac':
+       signal = int(re.sub('[^0-9]+', '', str(subprocess.check_output('iw dev wlan0 station get \'' + cf['component_checkmac']['mac'] + '\' | grep \'signal:\' | awk \'{print $2}\'', shell=True))))
+       inactivetime = int(re.sub('[^0-9]+', '', str(subprocess.check_output('iw dev wlan0 station get \'' + cf['component_checkmac']['mac'] + '\' | grep \'inactive time:\' | awk \'{print $3}\'', shell=True))))
+       string = cf['component_checkmac']['mac'] + ' ' + str(signal) + ' ' + str(inactivetime)
+       if cf['design'] == 'beauty':
+        draw.text((0,y), cf['component_checkmac']['mac'] + ' ' + str(signal) + ' ' + str(round(inactivetime / 1000)), font = font, fill = cf['font']['color'])
+        y += cf['linefeed']
+       if cf['design'] == 'terminal':
+        term.println(string)
+        time.sleep(2)
+   
    elif componentname == 'ipping':
        global lastping
      
