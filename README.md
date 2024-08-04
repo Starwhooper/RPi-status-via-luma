@@ -75,16 +75,16 @@ i recommend using https://pinout.xyz/# as reverence
 https://www.az-delivery.de/en/products/1-8-zoll-spi-tft-display
 
 connections:
-| Display Pin | Raspberry Pin |
-|---|---|
-| LED | GPIO 18 = Pin 12 |
-| SCK | Pin 23 |
-| SDA | Pin 19 |
-| A0 | GPIO23 = Pin 16 |
-| RESET | GPIO24 = Pin 18 |
-| CS | CE0 = Pin 24 |
-| GND | Ground |
-| VCC | 5V |
+| Display Pin | Raspberry Pin | Raspberry phys. Pin |
+|---|---|---|
+| LED | GPIO 18 | Pin 12 |
+| SCK | SCLK | Pin 23 |
+| SDA | MOSI | Pin 19 |
+| A0 | GPIO23 | Pin 16 |
+| RESET | GPIO24 | Pin 18 |
+| CS | CE0 | Pin 24 |
+| GND | Ground | Pin 6,9,14,20,25,30,34,39 (only one of them needed) |
+| VCC | 5V | Pin 2 and 4 (only one of them needed) |
 
 
 #### 0.91" OLED
