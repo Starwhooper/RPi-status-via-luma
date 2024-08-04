@@ -260,38 +260,44 @@ def stats(device):
     elif componentname == 'ipping':
         global lastping
       
-        try: ip = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['addr']
-        except: ip = 'noip'
-    
-        if cf['design'] == 'beauty':
-         try: lastping
-         except: lastping = 0
-         
-        # pinglocal = pinginternet = "offline"
-         if len(cf['component_ipping']['localpingdestination']) >= 1: localpingdestination = cf['component_ipping']['localpingdestination']
-         else: localpingdestination = ip[0:ip.rfind('.')] + '.1' #local ip ends with 1, as example 192.168.178.1 or 10.0.0.1
+        for interface in netifaces.interfaces():
+
+            if interface == 'lo':
+                continue
+
+            try: ip = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
+            except: ip = 'noip'
         
-         if len(cf['component_ipping']['remotepingdestination']) >= 1: remotepingdestination = cf['component_ipping']['remotepingdestination']
-         else: remotepingdestination = '8.8.8.8' #google dns
+            if cf['design'] == 'beauty':
+                try: lastping
+                except: lastping = 0
             
-         global pinglocalcolor
-         global pinginternetcolor
-        
-         if time.time() >= lastping + cf['component_ipping']['pingintervall']: #Ping systems all x seconds
-          if os.system('ping -c 1 -W 1 ' + localpingdestination + '>/dev/null') == 0: pinglocalcolor = 'Green'
-          else: pinglocalcolor = 'Red'
-          if os.system('ping -c 1 -W 1 ' + remotepingdestination + '>/dev/null') == 0: pinginternetcolor = 'Green'
-          else: pinginternetcolor = 'Red'
-          lastping = int(time.time())
-         draw.text((0,y), 'IP', font = font, fill = cf['font']['color'])
-         draw.text((0,y), '  L', font = font, fill = pinglocalcolor)
-         draw.text((0,y), '   R', font = font, fill = pinginternetcolor)
-         draw.text((cf['boxmarginleft'],y), ip , font = font, fill = cf['font']['color'])
-         draw.rectangle((0, y + 11) + (int( device.width / cf['component_ipping']['pingintervall'] * (int(time.time()) - lastping)), y + rectangle_y + 2), fill='Green', width=1)
-         y += cf['linefeed']+2
-        if cf['design'] == 'terminal':
-         term.println('IP: ' + ip)
-         time.sleep(2)
+            # pinglocal = pinginternet = "offline"
+            if len(cf['component_ipping']['localpingdestination']) >= 1: localpingdestination = cf['component_ipping']['localpingdestination']
+            else: localpingdestination = ip[0:ip.rfind('.')] + '.1' #local ip ends with 1, as example 192.168.178.1 or 10.0.0.1
+            
+            if len(cf['component_ipping']['remotepingdestination']) >= 1: remotepingdestination = cf['component_ipping']['remotepingdestination']
+            else: remotepingdestination = '8.8.8.8' #google dns
+                
+            global pinglocalcolor
+            global pinginternetcolor
+            
+            if time.time() >= lastping + cf['component_ipping']['pingintervall']: #Ping systems all x seconds
+                if os.system('ping -c 1 -W 1 -I ' + interface + ' ' + localpingdestination + '>/dev/null') == 0: pinglocalcolor = 'Green'
+                else: pinglocalcolor = 'Red'
+                if os.system('ping -c 1 -W 1 -I ' + interface + ' ' + remotepingdestination + '>/dev/null') == 0: pinginternetcolor = 'Green'
+                else: pinginternetcolor = 'Red'
+            lastping = int(time.time())
+            draw.text((0,y), 'IP', font = font, fill = cf['font']['color'])
+            draw.text((0,y), '  L', font = font, fill = pinglocalcolor)
+            draw.text((0,y), '   R', font = font, fill = pinginternetcolor)
+            draw.text((cf['boxmarginleft'],y), interface[0] + interface[0-1], font = font, fill = 'gray')
+            draw.text((cf['boxmarginleft'],y), '  ' + ip , font = font, fill = cf['font']['color'])
+            draw.rectangle((0, y + 11) + (int( device.width / cf['component_ipping']['pingintervall'] * (int(time.time()) - lastping)), y + rectangle_y + 2), fill='Green', width=1)
+            y += cf['linefeed']+2
+            if cf['design'] == 'terminal':
+                term.println('IP: ' + interface + ' ' + ip)
+                time.sleep(2)
     
     elif componentname == 'lastbackupimage':
         #hostname = str(socket.gethostname()).upper()
