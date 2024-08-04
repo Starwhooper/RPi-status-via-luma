@@ -25,8 +25,8 @@ will take effect after next reboot
 (choose luma.lcd (SPI) or luma.oled (I2C). Or choose booth if you are not sure what you need)
 ```bash
 sudo apt install python3-pip libopenjp2-7 python3-psutil python3-netifaces git -y
-sudo pip3 install luma.lcd
-sudo pip3 install luma.oled
+sudo apt install python3-luma.lcd
+sudo apt install python3-luma.oled
 sudo git clone https://github.com/rm-hull/luma.examples /opt/luma.examples
 ```
 
