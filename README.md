@@ -14,7 +14,14 @@ Please also note my previous solution based on Wireshark 144: https://github.com
 install all needed packages to prepare the software environtent of your Raspberry Pi:
 
 ### enable SPI or I2C
-(choose one of the two commands in depends of the interface of your display)
+(choose one of the two interfaces in depends of the interface of your display)
+since Bookworm is not more possible, to enable SPI or I2C Support vie command line. Thats means, is needed to start
+```bash
+sudo raspi-config
+```
+and enable the Interface to SPI or I2C manually.
+
+For pre-bookworm Version, you may go the previous way:
 ```bash
 sudo sed -i -e 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/config.txt
 sudo sed -i -e 's/#dtparam=i2c_arm=on/dtparam=i2c_arm=on/g' /boot/config.txt
