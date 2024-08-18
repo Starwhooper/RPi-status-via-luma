@@ -14,8 +14,8 @@ Please also note my previous solution based on Wireshark 144: https://github.com
 install all needed packages to prepare the software environtent of your Raspberry Pi:
 
 ### enable SPI or I2C
-(choose one of the two interfaces in depends of the interface of your display)
-since Bookworm is not more possible, to enable SPI or I2C Support vie command line. Thats means, is needed to start
+Choose one of the two interfaces in depends of the interface of your display. If you have no clue, check out below the chapter about Hardware->Display to know which one you need.
+Since Bookworm is not more possible, to enable SPI or I2C Support via command line. Thats means since Debian 12.0, is needed to start
 ```bash
 sudo raspi-config
 ```
@@ -52,17 +52,17 @@ Check https://github.com/Starwhooper/RPi-status-via-luma/wiki/explain-config.jso
 ### add to autostart ###
 
 add it to rc.local to autostart as boot
-in case of 1.8" OLED:
+in case of 1.8" OLED (SPI):
 ```bash
 sudo sed -i -e '$i \python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.examples/conf/st7735.conf &\n' /etc/rc.local
 ```
-in case of 0.91" OLED:
+in case of 0.91" OLED (I2C):
 ```bash
 sudo sed -i -e '$i \python3 /opt/RPi-status-via-luma/status.py  -d ssd1306 --height 32 &\n' /etc/rc.local
 ```
 if you get the response _status.py: error: I2C device not found: /dev/i2c-1_ you need to add the parameter --i2c-port 0
 
-in case of 1.44" Waveshare:
+in case of 1.44" Waveshare (SPI):
 ```bash
 sudo sed -i -e '$i \python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.examples/conf/st7735_128x128.conf &\n' /etc/rc.local
 ```
@@ -78,7 +78,7 @@ sudo git pull origin main
 ### Displays
 i recommend using https://pinout.xyz/# as reverence
 
-#### 1.8" OLED
+#### 1.8" OLED (SPI)
 https://www.az-delivery.de/en/products/1-8-zoll-spi-tft-display
 
 connections:
@@ -94,7 +94,7 @@ connections:
 | VCC | 5V | Pin 2 and 4 (only one of them needed) |
 
 
-#### 0.91" OLED
+#### 0.91" OLED (I2C)
 https://www.az-delivery.de/en/products/0-91-zoll-i2c-oled-display
 
 connections:
@@ -106,7 +106,7 @@ connections:
 | SDA | I2C1 SDA = Pin 3 |
 
 
-#### 1.44" Waveshare
+#### 1.44" Waveshare (SPI)
 https://www.waveshare.com/wiki/1.44inch_LCD_HAT
 
 connections:
