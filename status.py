@@ -195,40 +195,61 @@ def stats(device):
         logging.info('Board: ' + piboardinformation)
     
     elif componentname == 'uptime':
-        def formatTimeAgo(seconds):
-         if seconds < 60: return '%i seconds' % seconds
-         elif seconds < 3600: return '%i minutes' % (seconds/float(60))
-         elif seconds < (3600*24): return '%.1f hours' % (seconds/float(3600))
-         elif seconds < (3600*24*7): return '%.1f days' % (seconds/float(3600*24))
-         else: return '%.1f Weeks' % (seconds/float(3600*24*7))
-        string = formatTimeAgo(time.time() - psutil.boot_time())
-        if cf['design'] == 'beauty':
-         draw.text((0,y), 'uptm', font = font, fill = cf['font']['color'])
-         draw.text((cf['boxmarginleft'],y), string, font = font, fill = cf['font']['color'])
+     def format_time_ago(seconds):
+         if seconds < 60:
+             return f'{seconds} seconds'
+         elif seconds < 3600:
+             return f'{seconds / 60:.0f} minutes'
+         elif seconds < 86400:  # 3600 * 24
+             return f'{seconds / 3600:.1f} hours'
+         elif seconds < 604800:  # 3600 * 24 * 7
+             return f'{seconds / 86400:.1f} days'
+         else:
+             return f'{seconds / 604800:.1f} weeks'
+     uptime = format_time_ago(time.time() - psutil.boot_time())
+     if cf['design'] == 'beauty':
+         draw.text((0, y), 'uptm', font=font, fill=cf['font']['color'])
+         draw.text((cf['boxmarginleft'], y), uptime, font=font, fill=cf['font']['color'])
          y += cf['linefeed']
-        if cf['design'] == 'terminal':
-         term.println('Uptime: ' + string)
+     elif cf['design'] == 'terminal':
+         term.println(f'Uptime: {uptime}')
          time.sleep(2)
-        logging.info('Uptime: ' + string)
-    
+     logging.info(f'Uptime: {uptime}')
+
     elif componentname == 'cpu':
-        usage = int(float(psutil.cpu_percent()))
-        string = str(usage) + '%'
+        usage = int(psutil.cpu_percent())
+        usage_string = f'{usage}%'
+    
         if cf['design'] == 'beauty':
-         draw.text((0,y), 'CPU', font = font, fill = cf['font']['color'])
-         width = (device.width - 1 - cf['boxmarginleft'] ) /100 * usage
-         fontcolor = cf['font']['color']
-         fillcolor = valuetocolor(usage,[[80,"Red"],[60,"Yellow"],[0,"Green"]])
-         if fillcolor == 'Yellow': fontcolor = 'Grey'
-         draw.rectangle((cf['boxmarginleft'], y) + (cf['boxmarginleft'] + width, y + rectangle_y), fill=fillcolor, width=0)
-         draw.rectangle((cf['boxmarginleft'], y) + (device.width-1, y + rectangle_y), outline=cf['font']['color'], width=1)
-         draw.text((70,y), str(usage) + '%', font = font, fill = fontcolor)
-         y += cf['linefeed']
-        if cf['design'] == 'terminal':
-         term.println('CPU usage: ' + string)
-         time.sleep(2)
-        logging.info('CPU usage: ' + string)
-         
+            # Draw CPU label
+            draw.text((0, y), 'CPU', font=font, fill=cf['font']['color'])
+            
+            # Calculate bar width and colors
+            width = (device.width - 1 - cf['boxmarginleft']) * (usage / 100)
+            fill_color = valuetocolor(usage, [[80, "Red"], [60, "Yellow"], [0, "Green"]])
+            font_color = 'Grey' if fill_color == 'Yellow' else cf['font']['color']
+            
+            # Draw usage bar and outlines
+            draw.rectangle(
+                (cf['boxmarginleft'], y, cf['boxmarginleft'] + width, y + rectangle_y),
+                fill=fill_color
+            )
+            draw.rectangle(
+                (cf['boxmarginleft'], y, device.width - 1, y + rectangle_y),
+                outline=cf['font']['color'],
+                width=1
+            )
+    
+            # Display usage percentage
+            draw.text((70, y), usage_string, font=font, fill=font_color)
+            y += cf['linefeed']
+    
+        elif cf['design'] == 'terminal':
+            term.println(f'CPU usage: {usage_string}')
+            time.sleep(2)
+    
+        logging.info(f'CPU usage: {usage_string}')
+             
     elif componentname == 'os':
         def get_os_release():
          with open("/etc/os-release", "r") as file:
