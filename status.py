@@ -41,7 +41,7 @@ except:
 logging.getLogger("urllib3")
 logging.basicConfig(
  filename='/var/log/rpistatusvialuma.log', 
- level=logging.WARNING, encoding='utf-8', 
+ level=logging.DEBUG, encoding='utf-8', 
 # level=logging.WARNING, encoding='utf-8', 
  format='%(asctime)s:%(levelname)s:%(message)s'
 )
@@ -70,6 +70,7 @@ try:
  from demo_opts import get_device
 except:
  sys.exit("\033[91m {}\033[00m" .format('file ' + cf['luma']['demo_opts.py']['folder'] + '/demo_opts.py not found. Please check config.json or do sudo git clone https://github.com/rm-hull/luma.examples /opt/luma.examples'))
+ logging.critical(format('file ' + cf['luma']['demo_opts.py']['folder'] + '/demo_opts.py not found.'))
 
 ######own functions
 def valuetocolor(value,translation):
@@ -229,16 +230,22 @@ def stats(device):
         logging.info('CPU usage: ' + string)
          
     elif componentname == 'os':
-        debianversionfile = open('/etc/debian_version','r')
-        debianversion = debianversionfile.read()
+        def get_os_release():
+         with open("/etc/os-release", "r") as file:
+          os_info = {}
+          for line in file:
+           key, _, value = line.partition("=")
+           os_info[key.strip()] = value.strip().strip('"')
+          return os_info
+        os_info = get_os_release()
         if cf['design'] == 'beauty':
          draw.text((0,y), 'OS', font = font, fill = cf['font']['color'])
-         draw.text((cf['boxmarginleft'],y), debianversion, font = font, fill = cf['font']['color'])
+         draw.text((cf['boxmarginleft'],y), os_info.get('VERSION'), font = font, fill = cf['font']['color'])
          y += cf['linefeed']
         if cf['design'] == 'terminal':
-         term.println('OS: ' + debianversion)
+         term.println('OS: ' + os_info.get('VERSION'))
          time.sleep(2)
-        logging.info('OS: ' + debianversion)
+        logging.info('OS: ' + os_info.get('VERSION'))
          
     elif componentname == 'ram':
         gpuram = int(re.sub('[^0-9]+', '', str(subprocess.check_output('/usr/bin/vcgencmd get_mem gpu|cut -d= -f2', shell=True))))
@@ -314,7 +321,7 @@ def stats(device):
                 else: pinglocalcolor = 'Red'
                 if os.system('ping -c 1 -W 1 -I ' + interface + ' ' + remotepingdestination + '>/dev/null') == 0: pinginternetcolor = 'Green'
                 else: pinginternetcolor = 'Red'
-            lastping = int(time.time())
+                lastping = int(time.time())
             draw.text((0,y), 'IP', font = font, fill = cf['font']['color'])
             draw.text((0,y), '  L', font = font, fill = pinglocalcolor)
             draw.text((0,y), '   R', font = font, fill = pinginternetcolor)
