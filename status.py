@@ -21,7 +21,7 @@ try:
  from luma.core.virtual import terminal
  from pathlib import Path
  from PIL import ImageFont
- from datetime import datetime, timedelta  
+ from datetime import datetime, timedelta
 # import datetime
  import glob
  import json
@@ -40,9 +40,9 @@ except:
 ##### configure logging
 logging.getLogger("urllib3")
 logging.basicConfig(
- filename='/var/log/rpistatusvialuma.log', 
- level=logging.DEBUG, encoding='utf-8', 
-# level=logging.WARNING, encoding='utf-8', 
+ filename='/var/log/rpistatusvialuma.log',
+ level=logging.DEBUG, encoding='utf-8',
+# level=logging.WARNING, encoding='utf-8',
  format='%(asctime)s:%(levelname)s:%(message)s'
 )
 
@@ -55,7 +55,7 @@ logging.basicConfig(
 #    runninginstances += 1
 #if runninginstances >= 2:
 # sys.exit("\033[91m {}\033[00m" .format('exit: is already running'))
- 
+
 ##### import config.json
 try:
  with open(os.path.split(os.path.abspath(__file__))[0] + '/config.json','r') as file:
@@ -97,32 +97,32 @@ def stats(device):
  global lastmessage
  global alert
  try: lastmessage
- except: 
+ except:
   alert='maybe restart?'
   lastmessage = datetime(1977, 1, 1)
-  
+
 # alert=''
  with canvas(device, dither=True) as draw:
   if cf['design'] == 'terminal':
    term = terminal(device, font)
   global whole_y
   global offset_y
-  
+
   try: whole_y
   except: whole_y = 0
 
-  if whole_y >= device.height: 
-   try: offset_y = offset_y -1  
+  if whole_y >= device.height:
+   try: offset_y = offset_y -1
    except: offset_y = 0
   else: offset_y = 0
   y=1 + offset_y
 
   rectangle_y = draw.textbbox(xy=(0,0), text='AQjgp,;Ä', font=font)[3]
-  
+
   #check all components
   for componentname in cf['components']:
-   try: 
-    if componentname == 'currentdatetime': 
+   try:
+    if componentname == 'currentdatetime':
         string = '{:%a,%d.%b\'%y %H:%M:%S}'.format(datetime.now())
         if cf['design'] == 'beauty':
          draw.text((0,y), string, font = font, fill = cf['font']['color'])
@@ -131,7 +131,7 @@ def stats(device):
          term.println('Date: ' + string)
          time.sleep(2)
         logging.info('Date: ' + string)
-    
+
     elif componentname == 'hostname':
         ### font
         string = hostname.upper()
@@ -151,7 +151,7 @@ def stats(device):
          term.println('Hostname: ' + string)
          time.sleep(2)
         logging.info('Hostname: ' + string)
-    
+
     elif componentname == 'temperatur':
         tFile = open('/sys/class/thermal/thermal_zone0/temp')
         temp = int(format(int(float(tFile.read())/1000),'d'))
@@ -170,7 +170,7 @@ def stats(device):
          term.println('Temperature: ' + str(temp) + '°C')
          time.sleep(2)
         logging.info('Temperature: ' + str(temp) + '°C')
-                   
+
     elif componentname == 'board':
         if 'piboardinformation' not in locals():
          fobj = open('/sys/firmware/devicetree/base/model')
@@ -193,7 +193,7 @@ def stats(device):
          term.println('Board: ' + piboardinformation)
          time.sleep(2)
         logging.info('Board: ' + piboardinformation)
-    
+
     elif componentname == 'uptime':
      def format_time_ago(seconds):
          if seconds < 60:
@@ -219,16 +219,16 @@ def stats(device):
     elif componentname == 'cpu':
         usage = int(psutil.cpu_percent())
         usage_string = f'{usage}%'
-    
+
         if cf['design'] == 'beauty':
             # Draw CPU label
             draw.text((0, y), 'CPU', font=font, fill=cf['font']['color'])
-            
+
             # Calculate bar width and colors
             width = (device.width - 1 - cf['boxmarginleft']) * (usage / 100)
             fill_color = valuetocolor(usage, [[80, "Red"], [60, "Yellow"], [0, "Green"]])
             font_color = 'Grey' if fill_color == 'Yellow' else cf['font']['color']
-            
+
             # Draw usage bar and outlines
             draw.rectangle(
                 (cf['boxmarginleft'], y, cf['boxmarginleft'] + width, y + rectangle_y),
@@ -239,35 +239,47 @@ def stats(device):
                 outline=cf['font']['color'],
                 width=1
             )
-    
+
             # Display usage percentage
             draw.text((70, y), usage_string, font=font, fill=font_color)
             y += cf['linefeed']
-    
+
         elif cf['design'] == 'terminal':
             term.println(f'CPU usage: {usage_string}')
             time.sleep(2)
-    
+
         logging.info(f'CPU usage: {usage_string}')
-             
+
     elif componentname == 'os':
         def get_os_release():
-         with open("/etc/os-release", "r") as file:
-          os_info = {}
-          for line in file:
-           key, _, value = line.partition("=")
-           os_info[key.strip()] = value.strip().strip('"')
-          return os_info
+            os_info = {}
+            with open("/etc/os-release", "r") as file:
+                for line in file:
+                    key, _, value = line.partition("=")
+                    os_info[key.strip()] = value.strip().strip('"')
+            return os_info
+
+        def get_debian_version():
+            with open('/etc/debian_version', 'r') as file:
+                return file.read().strip()
+
+
         os_info = get_os_release()
+        debian_version = get_debian_version()
+
+        os_version_name = f"{debian_version} ({os_info.get('VERSION_CODENAME', 'unknown')})"
+
         if cf['design'] == 'beauty':
-         draw.text((0,y), 'OS', font = font, fill = cf['font']['color'])
-         draw.text((cf['boxmarginleft'],y), os_info.get('VERSION'), font = font, fill = cf['font']['color'])
-         y += cf['linefeed']
-        if cf['design'] == 'terminal':
-         term.println('OS: ' + os_info.get('VERSION'))
-         time.sleep(2)
-        logging.info('OS: ' + os_info.get('VERSION'))
-         
+            draw.text((0, y), 'OS', font=font, fill=cf['font']['color'])
+            draw.text((cf['boxmarginleft'], y), os_version_name, font=font, fill=cf['font']['color'])
+            y += cf['linefeed']
+        elif cf['design'] == 'terminal':
+            term.println(f"OS: {os_version_name}")
+            time.sleep(2)
+
+        logging.info(f"OS: {os_version_name}")
+
+
     elif componentname == 'ram':
         gpuram = int(re.sub('[^0-9]+', '', str(subprocess.check_output('/usr/bin/vcgencmd get_mem gpu|cut -d= -f2', shell=True))))
         totalmem = round(psutil.virtual_memory()[0] / 1000 ** 2) + gpuram
@@ -293,7 +305,7 @@ def stats(device):
          term.println('RAM: ' + string)
          time.sleep(2)
         logging.info('RAM: ' + string)
-         
+
     elif componentname == 'checkmac':
         try:
          signal = int(re.sub('[^0-9]+', '', str(subprocess.check_output('iw dev wlan0 station get \'' + cf['component_checkmac']['mac'] + '\' | grep \'signal:\' | awk \'{print $2}\'', shell=True))))
@@ -311,10 +323,10 @@ def stats(device):
          term.println('MAC: ' + string)
          time.sleep(2)
         logging.info('MAC: ' + string)
-         
+
     elif componentname == 'ipping':
         global lastping
-      
+
         for interface in netifaces.interfaces():
 
             if interface == 'lo':
@@ -322,21 +334,21 @@ def stats(device):
 
             try: ip = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
             except: ip = 'noip'
-        
+
             if cf['design'] == 'beauty':
                 try: lastping
                 except: lastping = 0
-            
+
             # pinglocal = pinginternet = "offline"
             if len(cf['component_ipping']['localpingdestination']) >= 1: localpingdestination = cf['component_ipping']['localpingdestination']
             else: localpingdestination = ip[0:ip.rfind('.')] + '.1' #local ip ends with 1, as example 192.168.178.1 or 10.0.0.1
-            
+
             if len(cf['component_ipping']['remotepingdestination']) >= 1: remotepingdestination = cf['component_ipping']['remotepingdestination']
             else: remotepingdestination = '8.8.8.8' #google dns
-                
+
             global pinglocalcolor
             global pinginternetcolor
-            
+
             if time.time() >= lastping + cf['component_ipping']['pingintervall']: #Ping systems all x seconds
                 if os.system('ping -c 1 -W 1 -I ' + interface + ' ' + localpingdestination + '>/dev/null') == 0: pinglocalcolor = 'Green'
                 else: pinglocalcolor = 'Red'
@@ -354,14 +366,14 @@ def stats(device):
                 term.println('IP: ' + interface + ' ' + ip)
                 time.sleep(2)
             logging.info('IP: ' + interface + ' ' + ip)
-    
+
     elif componentname == 'lastbackupimage':
         #hostname = str(socket.gethostname()).upper()
         try: lastimagemarqueepos
         except: lastimagemarqueepos = 0
         try: lastimagemarqueewait
         except: lastimagemarqueewait = 0
-       
+
         checkforlatestfile = str(cf['component_lastbackupimage']['checkforlatestfile']).replace('%HOSTNAME%', str(hostname).lower())
         list_of_files = glob.glob(checkforlatestfile)
         if cf['design'] == 'beauty':
@@ -383,16 +395,16 @@ def stats(device):
           term.println('backup: ' + latest_file_name)
           time.sleep(2)
          logging.info('backup: ' + latest_file_name)
-    
+
     elif componentname == 'helloworld':
          if cf['design'] == 'beauty':
           draw.text((0,y), 'Hello World', font = font, fill = 'Yellow')
-          y += cf['linefeed']   
+          y += cf['linefeed']
          if cf['design'] == 'terminal':
           term.println('Hello World')
           time.sleep(2)
          logging.info('Hello World')
-          
+
     elif componentname == 'empty':
          if cf['design'] == 'beauty':
           draw.text((0,y), '', font = font, fill = 'Yellow')
@@ -401,7 +413,7 @@ def stats(device):
           term.println()
           time.sleep(2)
          logging.info(' ')
-          
+
     elif componentname == 'version':
         string = re.sub('[^0-9\-]+', '', str(subprocess.check_output('git -C ' + os.path.split(os.path.abspath(__file__))[0] + ' show -s --format=%cd --date=format:\'%y%m%d-%H%M\'', shell=True)))
         if cf['design'] == 'beauty':
@@ -412,10 +424,10 @@ def stats(device):
          term.println('Version: ' + string)
          time.sleep(2)
         logging.info('Version: ' + string)
-    
+
     elif componentname == 'drives':
         drivenumber = 0
-       
+
         for drive in cf['component_drive']['drive']:
          if os.path.isdir(drive):
 #          alert = ''
@@ -423,11 +435,11 @@ def stats(device):
           freesd = psutil.disk_usage(drive).free
           usagesd = totalsd - freesd
           usagesdpercent = 100 / totalsd * usagesd
-        
+
           usagesd = round(usagesd / (1024.0 ** 3),1)
-        
+
           string =  str(usagesd) + '/' + str(round(totalsd / 1024.0 ** 3,1)) + 'GB'
-          
+
           if cf['design'] == 'beauty':
            draw.text((0,y), 'Drv' + str(drivenumber), font = font, fill = cf['font']['color'])
            width = (device.width - 1 - cf['boxmarginleft']) /100 * usagesdpercent
@@ -440,25 +452,25 @@ def stats(device):
            drivenumber += 1
            if usagesdpercent >= 80:
             alert = '<b>' + drive + '</b>: <font color="' + fillcolor + '">' + str(round(usagesdpercent)) + '%</font> ' + str(usagesd) + ' GB used'
-           y += cf['linefeed']                
-           
+           y += cf['linefeed']
+
           if cf['design'] == 'terminal':
            term.println('Drive: ' + drive + ' = ' + str(string))
            time.sleep(2)
          else:
           if cf['design'] == 'beauty':
            print('folder ' + drive + ' not found')
-           y += cf['linefeed']                
+           y += cf['linefeed']
           if cf['design'] == 'terminal':
            term.println('Drive: ' + drive + ' not found')
            time.sleep(2)
           logging.info('Drive: ' + drive + ' not found')
-     
+
     else:
      draw.text((0,y), 'unknown component', font = font, fill = 'RED')
      y += cf['linefeed']
      logging.error('unknown component')
-     
+
    except:
     draw.text((0,y), 'component issue', font = font, fill = 'RED')
     y += cf['linefeed']
