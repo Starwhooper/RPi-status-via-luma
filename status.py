@@ -8,6 +8,13 @@
 #
 #######################################################
 
+#Logging Levels https://rollbar.com/blog/logging-in-python/#
+#    DEBUG - Detailed information, typically of interest when diagnosing problems.
+#    INFO - Confirmation of things working as expected.
+#    WARNING - Indication of something unexpected or a problem in the near future e.g. 'disk space low'.
+#    ERROR - A more serious problem due to which the program was unable to perform a function.
+#    CRITICAL - A serious error, indicating that the program itself may not be able to continue executing.
+
 ##### check if all required packages are aviable
 try:
  from luma.core.render import canvas
@@ -18,6 +25,7 @@ try:
 # import datetime
  import glob
  import json
+ import logging
  import netifaces
  import os
  import psutil
@@ -29,21 +37,31 @@ try:
 except:
  sys.exit("\033[91m {}\033[00m" .format('any needed package is not aviable. Please check README.md to check which components shopuld be installed via pip3".'))
 
-##### ensure that only one instance is running at the same time
-runninginstances = 0
-for p in psutil.process_iter():
- if len(p.cmdline()) == 2:
-  if p.cmdline()[0] == '/usr/bin/python3':
-   if p.cmdline()[1] == os.path.abspath(__file__):
-    runninginstances += 1
-if runninginstances >= 2:
- sys.exit("\033[91m {}\033[00m" .format('exit: is already running'))
+##### configure logging
+logging.getLogger("urllib3")
+logging.basicConfig(
+ filename='/var/log/rpistatusvialuma.log', 
+ level=logging.WARNING, encoding='utf-8', 
+# level=logging.WARNING, encoding='utf-8', 
+ format='%(asctime)s:%(levelname)s:%(message)s'
+)
+
+##### ensure that only one instance is running at the same time (not more needed, in reason of starting as service instead of cronjob
+#runninginstances = 0
+#for p in psutil.process_iter():
+# if len(p.cmdline()) == 2:
+#  if p.cmdline()[0] == '/usr/bin/python3':
+#   if p.cmdline()[1] == os.path.abspath(__file__):
+#    runninginstances += 1
+#if runninginstances >= 2:
+# sys.exit("\033[91m {}\033[00m" .format('exit: is already running'))
  
 ##### import config.json
 try:
  with open(os.path.split(os.path.abspath(__file__))[0] + '/config.json','r') as file:
   cf = json.loads(file.read())
 except:
+ logging.critical('The configuration file ' + os.path.split(os.path.abspath(__file__))[0] + '/config.json does not exist or has incorrect content.')
  sys.exit("\033[91m {}\033[00m" .format('exit: The configuration file ' + os.path.split(os.path.abspath(__file__))[0] + '/config.json does not exist or has incorrect content. Please rename the file config.json.example to config.json and change the content as required '))
 
 ##### import module demo_opts
@@ -111,6 +129,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Date: ' + string)
          time.sleep(2)
+        logging.info('Date: ' + string)
     
     elif componentname == 'hostname':
         ### font
@@ -130,6 +149,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Hostname: ' + string)
          time.sleep(2)
+        logging.info('Hostname: ' + string)
     
     elif componentname == 'temperatur':
         tFile = open('/sys/class/thermal/thermal_zone0/temp')
@@ -148,6 +168,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Temperature: ' + str(temp) + '°C')
          time.sleep(2)
+        logging.info('Temperature: ' + str(temp) + '°C')
                    
     elif componentname == 'board':
         if 'piboardinformation' not in locals():
@@ -170,6 +191,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Board: ' + piboardinformation)
          time.sleep(2)
+        logging.info('Board: ' + piboardinformation)
     
     elif componentname == 'uptime':
         def formatTimeAgo(seconds):
@@ -186,6 +208,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Uptime: ' + string)
          time.sleep(2)
+        logging.info('Uptime: ' + string)
     
     elif componentname == 'cpu':
         usage = int(float(psutil.cpu_percent()))
@@ -203,6 +226,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('CPU usage: ' + string)
          time.sleep(2)
+        logging.info('CPU usage: ' + string)
          
     elif componentname == 'os':
         debianversionfile = open('/etc/debian_version','r')
@@ -214,6 +238,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('OS: ' + debianversion)
          time.sleep(2)
+        logging.info('OS: ' + debianversion)
          
     elif componentname == 'ram':
         gpuram = int(re.sub('[^0-9]+', '', str(subprocess.check_output('/usr/bin/vcgencmd get_mem gpu|cut -d= -f2', shell=True))))
@@ -239,6 +264,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('RAM: ' + string)
          time.sleep(2)
+        logging.info('RAM: ' + string)
          
     elif componentname == 'checkmac':
         try:
@@ -254,8 +280,9 @@ def stats(device):
          draw.text((0,y), cf['component_checkmac']['mac'] + ' ' + str(signal) + ' ' + str(round(inactivetime / 1000)), font = font, fill = cf['font']['color'])
          y += cf['linefeed']
         if cf['design'] == 'terminal':
-         term.println(string)
+         term.println('MAC: ' + string)
          time.sleep(2)
+        logging.info('MAC: ' + string)
          
     elif componentname == 'ipping':
         global lastping
@@ -298,6 +325,7 @@ def stats(device):
             if cf['design'] == 'terminal':
                 term.println('IP: ' + interface + ' ' + ip)
                 time.sleep(2)
+            logging.info('IP: ' + interface + ' ' + ip)
     
     elif componentname == 'lastbackupimage':
         #hostname = str(socket.gethostname()).upper()
@@ -326,6 +354,7 @@ def stats(device):
           latest_file_name = os.path.basename(latest_file)
           term.println('backup: ' + latest_file_name)
           time.sleep(2)
+         logging.info('backup: ' + latest_file_name)
     
     elif componentname == 'helloworld':
          if cf['design'] == 'beauty':
@@ -334,6 +363,7 @@ def stats(device):
          if cf['design'] == 'terminal':
           term.println('Hello World')
           time.sleep(2)
+         logging.info('Hello World')
           
     elif componentname == 'empty':
          if cf['design'] == 'beauty':
@@ -342,6 +372,7 @@ def stats(device):
          if cf['design'] == 'terminal':
           term.println()
           time.sleep(2)
+         logging.info(' ')
           
     elif componentname == 'version':
         string = re.sub('[^0-9\-]+', '', str(subprocess.check_output('git -C ' + os.path.split(os.path.abspath(__file__))[0] + ' show -s --format=%cd --date=format:\'%y%m%d-%H%M\'', shell=True)))
@@ -352,6 +383,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Version: ' + string)
          time.sleep(2)
+        logging.info('Version: ' + string)
     
     elif componentname == 'drives':
         drivenumber = 0
@@ -392,9 +424,13 @@ def stats(device):
           if cf['design'] == 'terminal':
            term.println('Drive: ' + drive + ' not found')
            time.sleep(2)
+          logging.info('Drive: ' + drive + ' not found')
+     
     else:
-         draw.text((0,y), 'unknown component', font = font, fill = 'RED')
-         y += cf['linefeed']
+     draw.text((0,y), 'unknown component', font = font, fill = 'RED')
+     y += cf['linefeed']
+     logging.error('unknown component')
+     
    except:
     draw.text((0,y), 'component issue', font = font, fill = 'RED')
     y += cf['linefeed']
