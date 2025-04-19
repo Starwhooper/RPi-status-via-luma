@@ -46,11 +46,13 @@ except:
  sys.exit("\033[91m {}\033[00m" .format('exit: The configuration file ' + os.path.split(os.path.abspath(__file__))[0] + '/config.json does not exist or has incorrect content. Please rename the file config.json.example to config.json and change the content as required '))
 
 ##### configure logging
-if cf['logging']['level'] == "debug": logging_level = logging.DEBUG
-elif cf['logging']['level'] == "info": logging_level = logging.INFO
-elif cf['logging']['level'] == "error": logging_level = logging.ERROR
-elif cf['logging']['level'] == "critical": logging_level = logging.CRITICAL
-else: logging_level = logging.WARNING
+try:
+ if cf['logging']['level'] == "debug": logging_level = logging.DEBUG
+ elif cf['logging']['level'] == "info": logging_level = logging.INFO
+ elif cf['logging']['level'] == "error": logging_level = logging.ERROR
+ elif cf['logging']['level'] == "critical": logging_level = logging.CRITICAL
+except:
+ logging_level = logging.WARNING
 try:
  logging_file = cf.['logging']['file']
 except:
