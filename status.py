@@ -93,6 +93,7 @@ def stats(device):
  try: lastmessage
  except:
   alert='maybe restart?'
+  logging.critical('maybe restart?')
   lastmessage = datetime(1977, 1, 1)
 
 # alert=''
