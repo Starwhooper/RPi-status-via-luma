@@ -54,7 +54,7 @@ try:
 except:
  logging_level = logging.WARNING
 try:
- logging_file = cf.['logging']['file']
+ logging_file = cf['logging']['file']
 except:
  logging_file = '/var/log/rpistatusvialuma.log'
 logging.getLogger("urllib3")
