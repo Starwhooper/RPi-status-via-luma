@@ -125,7 +125,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Date: ' + string)
          time.sleep(2)
-        logging.info('Date: ' + string)
+        logging.debug('Date: ' + string)
 
     elif componentname == 'hostname':
         ### font
@@ -145,7 +145,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Hostname: ' + string)
          time.sleep(2)
-        logging.info('Hostname: ' + string)
+        logging.debug('Hostname: ' + string)
 
     elif componentname == 'temperatur':
         tFile = open('/sys/class/thermal/thermal_zone0/temp')
@@ -164,7 +164,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Temperature: ' + str(temp) + '°C')
          time.sleep(2)
-        logging.info('Temperature: ' + str(temp) + '°C')
+        logging.debug('Temperature: ' + str(temp) + '°C')
 
     elif componentname == 'board':
         if 'piboardinformation' not in locals():
@@ -187,7 +187,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Board: ' + piboardinformation)
          time.sleep(2)
-        logging.info('Board: ' + piboardinformation)
+        logging.debug('Board: ' + piboardinformation)
 
     elif componentname == 'uptime':
      def format_time_ago(seconds):
@@ -209,7 +209,7 @@ def stats(device):
      elif cf['design'] == 'terminal':
          term.println(f'Uptime: {uptime}')
          time.sleep(2)
-     logging.info(f'Uptime: {uptime}')
+     logging.debug(f'Uptime: {uptime}')
 
     elif componentname == 'cpu':
         usage = int(psutil.cpu_percent())
@@ -243,7 +243,7 @@ def stats(device):
             term.println(f'CPU usage: {usage_string}')
             time.sleep(2)
 
-        logging.info(f'CPU usage: {usage_string}')
+        logging.debug(f'CPU usage: {usage_string}')
 
     elif componentname == 'os':
         def get_os_release():
@@ -272,7 +272,7 @@ def stats(device):
             term.println(f"OS: {os_version_name}")
             time.sleep(2)
 
-        logging.info(f"OS: {os_version_name}")
+        logging.debug(f"OS: {os_version_name}")
 
 
     elif componentname == 'ram':
@@ -299,7 +299,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('RAM: ' + string)
          time.sleep(2)
-        logging.info('RAM: ' + string)
+        logging.debug('RAM: ' + string)
 
     elif componentname == 'checkmac':
         try:
@@ -317,7 +317,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('MAC: ' + string)
          time.sleep(2)
-        logging.info('MAC: ' + string)
+        logging.debug('MAC: ' + string)
 
     elif componentname == 'ipping':
         global lastping
@@ -360,7 +360,7 @@ def stats(device):
             if cf['design'] == 'terminal':
                 term.println('IP: ' + interface + ' ' + ip)
                 time.sleep(2)
-            logging.info('IP: ' + interface + ' ' + ip)
+            logging.debug('IP: ' + interface + ' ' + ip)
 
     elif componentname == 'lastbackupimage':
         #hostname = str(socket.gethostname()).upper()
@@ -389,7 +389,7 @@ def stats(device):
           latest_file_name = os.path.basename(latest_file)
           term.println('backup: ' + latest_file_name)
           time.sleep(2)
-         logging.info('backup: ' + latest_file_name)
+         logging.debug('backup: ' + latest_file_name)
 
     elif componentname == 'helloworld':
          if cf['design'] == 'beauty':
@@ -398,7 +398,7 @@ def stats(device):
          if cf['design'] == 'terminal':
           term.println('Hello World')
           time.sleep(2)
-         logging.info('Hello World')
+         logging.debug('Hello World')
 
     elif componentname == 'empty':
          if cf['design'] == 'beauty':
@@ -407,7 +407,7 @@ def stats(device):
          if cf['design'] == 'terminal':
           term.println()
           time.sleep(2)
-         logging.info(' ')
+         logging.debug(' ')
 
     elif componentname == 'version':
         string = re.sub('[^0-9\-]+', '', str(subprocess.check_output('git -C ' + os.path.split(os.path.abspath(__file__))[0] + ' show -s --format=%cd --date=format:\'%y%m%d-%H%M\'', shell=True)))
@@ -418,7 +418,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Version: ' + string)
          time.sleep(2)
-        logging.info('Version: ' + string)
+        logging.debug('Version: ' + string)
 
     elif componentname == 'drives':
         drivenumber = 0
@@ -459,7 +459,7 @@ def stats(device):
           if cf['design'] == 'terminal':
            term.println('Drive: ' + drive + ' not found')
            time.sleep(2)
-          logging.info('Drive: ' + drive + ' not found')
+          logging.debug('Drive: ' + drive + ' not found')
 
     else:
      draw.text((0,y), 'unknown component', font = font, fill = 'RED')
