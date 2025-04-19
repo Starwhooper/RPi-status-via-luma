@@ -37,25 +37,6 @@ try:
 except:
  sys.exit("\033[91m {}\033[00m" .format('any needed package is not aviable. Please check README.md to check which components shopuld be installed via pip3".'))
 
-##### configure logging
-logging.getLogger("urllib3")
-logging.basicConfig(
- filename='/var/log/rpistatusvialuma.log',
- level=logging.DEBUG, encoding='utf-8',
-# level=logging.WARNING, encoding='utf-8',
- format='%(asctime)s:%(levelname)s:%(message)s'
-)
-
-##### ensure that only one instance is running at the same time (not more needed, in reason of starting as service instead of cronjob
-#runninginstances = 0
-#for p in psutil.process_iter():
-# if len(p.cmdline()) == 2:
-#  if p.cmdline()[0] == '/usr/bin/python3':
-#   if p.cmdline()[1] == os.path.abspath(__file__):
-#    runninginstances += 1
-#if runninginstances >= 2:
-# sys.exit("\033[91m {}\033[00m" .format('exit: is already running'))
-
 ##### import config.json
 try:
  with open(os.path.split(os.path.abspath(__file__))[0] + '/config.json','r') as file:
@@ -63,6 +44,20 @@ try:
 except:
  logging.critical('The configuration file ' + os.path.split(os.path.abspath(__file__))[0] + '/config.json does not exist or has incorrect content.')
  sys.exit("\033[91m {}\033[00m" .format('exit: The configuration file ' + os.path.split(os.path.abspath(__file__))[0] + '/config.json does not exist or has incorrect content. Please rename the file config.json.example to config.json and change the content as required '))
+
+##### configure logging
+if cf['logging']['level'] == "debug": logging_level = logging.DEBUG
+elif cf['logging']['level'] == "info": logging_level = logging.INFO
+elif cf['logging']['level'] == "error": logging_level = logging.ERROR
+elif cf['logging']['level'] == "critical": logging_level = logging.CRITICAL
+else: logging_level = logging.WARNING
+logging.getLogger("urllib3")
+logging.basicConfig(
+ filename=cf['logging']['file'],
+ level=logging_level,
+ encoding='utf-8',
+ format='%(asctime)s:%(levelname)s:%(message)s'
+)
 
 ##### import module demo_opts
 try:
@@ -90,7 +85,6 @@ if cf['font']['ttf'] == True:
 else:
  font = ImageFont.load_default()
 # font = ImageFont.load("arial.pil")
-
 
 ##### do output
 def stats(device):
