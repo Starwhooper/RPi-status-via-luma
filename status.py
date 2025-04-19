@@ -51,9 +51,10 @@ elif cf['logging']['level'] == "info": logging_level = logging.INFO
 elif cf['logging']['level'] == "error": logging_level = logging.ERROR
 elif cf['logging']['level'] == "critical": logging_level = logging.CRITICAL
 else: logging_level = logging.WARNING
+logging_file = cf.get('logging', {}).get('file', '/var/log/rpistatusvialuma.log')
 logging.getLogger("urllib3")
 logging.basicConfig(
- filename=cf['logging']['file'],
+ filename=logging_file,
  level=logging_level,
  encoding='utf-8',
  format='%(asctime)s:%(levelname)s:%(message)s'
