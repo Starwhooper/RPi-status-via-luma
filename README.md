@@ -70,7 +70,7 @@ in case of 1.44" Waveshare (SPI):
 python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.examples/conf/st7735_128x128_WShat.conf
 ```
 
-#### start by service ####
+#### to start as service ####
 ```bash
 echo [Unit] | sudo tee -a /etc/systemd/system/rpistatus.service
 echo Description=RPi Status via Luma | sudo tee -a /etc/systemd/system/rpistatus.service
