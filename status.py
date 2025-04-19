@@ -125,6 +125,7 @@ def stats(device):
    try:
     if componentname == 'currentdatetime':
         string = '{:%a,%d.%b\'%y %H:%M:%S}'.format(datetime.now())
+        string = string.replace(string[:3], string[:2])
         if cf['design'] == 'beauty':
          draw.text((0,y), string, font = font, fill = cf['font']['color'])
          y += cf['linefeed']
