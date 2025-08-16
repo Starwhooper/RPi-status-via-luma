@@ -91,6 +91,7 @@ sudo systemctl enable rpistatus.service
 If you already use it, feel free to update with
 ```bash
 cd /opt/RPi-status-via-luma
+sudo git reset --hard #online nessesary if you changed the code
 sudo git pull origin main
 ```
 
