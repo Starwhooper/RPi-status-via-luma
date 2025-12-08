@@ -29,6 +29,7 @@ sudo sed -i -e 's/#dtparam=i2c_arm=on/dtparam=i2c_arm=on/g' /boot/config.txt
 will take effect after next reboot
 
 ### install required components
+install python 3 components, [luma with examples](https://github.com/rm-hull/luma.examples) and more.
 (choose luma.lcd (SPI) or luma.oled (I2C). Or choose booth if you are not sure what you need)
 ```bash
 sudo apt install python3-pip libopenjp2-7 python3-psutil python3-netifaces git -y
