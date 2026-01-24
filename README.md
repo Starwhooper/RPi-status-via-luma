@@ -16,17 +16,26 @@ install all needed packages to prepare the software environtent of your Raspberr
 ### enable SPI or I2C
 Choose one of the two interfaces in depends of the interface of your display. If you have no clue, check out below the chapter about Hardware->Display to know which one you need.
 Since Bookworm is not more possible, to enable SPI or I2C Support via command line. Thats means since Debian 12.0, is needed to start
+
+#### on trixi:
+```bash
+sudo raspi-config nonint do_spi 0
+sudo raspi-config nonint do_i2c 0
+````
+
+#### on bookworm:
 ```bash
 sudo raspi-config
 ```
 and enable the Interface to SPI or I2C manually.
 
-For pre-bookworm Version, you may go the previous way:
+#### other earlier versions:
 ```bash
 sudo sed -i -e 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/config.txt
 sudo sed -i -e 's/#dtparam=i2c_arm=on/dtparam=i2c_arm=on/g' /boot/config.txt
 ```
-will take effect after next reboot
+
+all of it will take effect after next reboot
 
 ### install required components
 install python 3 components, [luma with examples](https://github.com/rm-hull/luma.examples) and more.
@@ -38,6 +47,7 @@ sudo apt install python3-luma.oled
 sudo git clone https://github.com/rm-hull/luma.examples /opt/luma.examples
 ```
 #### WaveShare 1.4 Hat
+in case of a WareShare 1.4 hat, its nessesary to add a additonal configurationfile to luma
 ```bash
 sudo wget https://raw.githubusercontent.com/Starwhooper/luma.examples/patch-1/conf/st7735_128x128_WShat.conf -O /opt/luma.examples/conf/st7735_128x128_WShat.conf
 ```
@@ -92,7 +102,7 @@ sudo systemctl enable rpistatus.service
 If you already use it, feel free to update with
 ```bash
 cd /opt/RPi-status-via-luma
-sudo git reset --hard #online nessesary if you changed the code
+sudo git reset --hard #online nessesary if you changed the local code meanwhile
 sudo git pull origin main
 ```
 
@@ -144,6 +154,5 @@ connections:
 
 
 ### Case ###
-![Display](https://cdn.thingiverse.com/assets/b8/cf/98/25/7c/featured_preview_RPiRack_with_lcd_and_fan.png)
-
+![Display](https://media.printables.com/media/prints/300085/stls/2713235_9723117c-592d-490b-b367-599f8e6dbcb8/thumbs/cover/320x240/png/rpi3_fan_sd_18display-v20221107_preview.webp)
 Your can get the openSCAD or STL File and more details regarding the Hardware here: https://www.printables.com/de/model/300085 
