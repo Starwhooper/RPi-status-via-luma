@@ -12,9 +12,9 @@
    "boxmarginleft":27,
    "font": {
       "color": "WHITE",
-      "ttf": false,
-      "ttffile": "/opt/luma.examples/examples/fonts/tiny.ttf",
-      "ttfsize": 6
+      "ttf": true,
+      "ttffile": "/opt/luma.examples/examples/fonts/DejaVuSansMono.ttf",
+      "ttfsize": 8
    },
    "imagerefresh":0.2,
    "linefeed":10,
