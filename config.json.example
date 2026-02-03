@@ -32,8 +32,15 @@
       "os",
       "version",
       "helloworld",
+      "pihole",
       "empty"
    ],
+   "component_pihole": {
+    "dbfile": "/etc/pihole/pihole-FTL.db",
+	 "showlastblockeddomain": true,
+	 "showblockedlast24h": true,
+	 "allowedstatus": "0,2,3,12,13,14,17"
+   },
    "component_checkmac": {
     "mac": "00:00:00:00:00:00"
    },   
