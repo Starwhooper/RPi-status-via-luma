@@ -1,41 +1,47 @@
 # RPi-status-via-luma #
 
-To provide the Status of your Raspberry (tested on Zero, 2, 3 and 4) to an ST7735S OLED Display.
+To provide the Status of your Raspberry tested on Zero, Zero 2, 2, 3 and 4) to an ST7735S OLED Display. If you use a Wireshark 1.44", please note my previous solution: https://github.com/Starwhooper/RPi-status-on-OLED
 
 I use this script to get a quick and up-to-date status of the system every time I walk past my Raspberry Pis.
 In this way I can see at a glance the current workload, whether problems are looming and whether the service is currently running.
 
 My Raspberrys prepared to mounted in my 19Rack:
-![Raspberry Pis im Rack](https://media.printables.com/media/prints/300085/images/2715870_a53f284c-180c-4feb-9401-bd60474f65ca/thumbs/inside/1920x1440/jpg/img20221108094538.webp)
-
-Please also note my previous solution based on Wireshark 144: https://github.com/Starwhooper/RPi-status-on-OLED
+![Raspberry Pis in 19" rack](https://github.com/Starwhooper/RPi-status-via-luma/blob/main/pictures/somerpisinrack.webp)
+![Front of a common enclosure](https://github.com/Starwhooper/RPi-status-via-luma/blob/main/pictures/commonfront.webp)
 
 ## Installation
 install all needed packages to prepare the software environtent of your Raspberry Pi:
 
 ### enable SPI or I2C
-Choose one of the two interfaces in depends of the interface of your display. If you have no clue, check out below the chapter about Hardware->Display to know which one you need.
-Since Bookworm is not more possible, to enable SPI or I2C Support via command line. Thats means since Debian 12.0, is needed to start
+Choose one of the two interfaces in depends of the interface of your display. If you have no clue, check out below the chapter about ![Hardware](https://github.com/Starwhooper/RPi-status-via-luma/edit/main/README.md#hardware) -> Display to know which interface your display need.
 
-#### on trixi:
+#### enable spi on trixi:
 ```bash
 sudo raspi-config nonint do_spi 0
+````
+#### enable i2c on trixi:
+```bash
 sudo raspi-config nonint do_i2c 0
 ````
-
-#### on bookworm:
+#### enable spi or i2c on bookworm:
 ```bash
 sudo raspi-config
 ```
 and enable the Interface to SPI or I2C manually.
-
-#### other earlier versions:
+#### enable spi on earlier versions:
 ```bash
 sudo sed -i -e 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/config.txt
+```
+#### enable i2c on earlier versions:
+```bash
 sudo sed -i -e 's/#dtparam=i2c_arm=on/dtparam=i2c_arm=on/g' /boot/config.txt
 ```
 
 all of it will take effect after next reboot
+```bash
+sudo reboot
+```
+
 
 ### install required components
 install python 3 components, [luma with examples](https://github.com/rm-hull/luma.examples) and more.
