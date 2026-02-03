@@ -417,6 +417,34 @@ def stats(device):
           time.sleep(2)
          logging.debug(' ')
 
+    elif componentname == 'pihole':
+         import sqlite3
+         con = sqlite3.connect(cf['component_pihole']['dbfile'])
+         cur = con.cursor()
+         if cf['component_pihole']['showlastblockeddomain'] == True:
+          cur.execute("SELECT domain FROM queries WHERE status NOT IN (" + cf['component_pihole']['allowedstatus'] + ") ORDER BY timestamp DESC LIMIT 1;")
+          blockeddomain = cur.fetchone()[0]
+          blockedbasedomain = ".".join(blockeddomain.split(".") [-3:])
+          string = 'blkd: ' + blockedbasedomain
+          if cf['design'] == 'beauty':
+           draw.text((0,y), string, font = font, fill = cf['font']['color'])
+           y += cf['linefeed']
+          if cf['design'] == 'terminal':
+           term.println(string)
+           time.sleep(2)
+         if cf['component_pihole']['showblockedlast24h'] == True:
+          cur.execute("SELECT COUNT(id) FROM queries WHERE status NOT IN (" + cf['component_pihole']['allowedstatus'] + ") and timestamp >= strftime('%s','now','-24 hours');")
+          blocked24h = cur.fetchone()
+          string = 'blkc: ' + str(blocked24h[0]) + ' in 24h'
+          if cf['design'] == 'beauty':
+           draw.text((0,y), string, font = font, fill = cf['font']['color'])
+           y += cf['linefeed']
+          if cf['design'] == 'terminal':
+           term.println(string)
+           time.sleep(2)
+          
+         logging.debug(' ')
+
     elif componentname == 'version':
         string = re.sub('[^0-9\-]+', '', str(subprocess.check_output('git -C ' + os.path.split(os.path.abspath(__file__))[0] + ' show -s --format=%cd --date=format:\'%y%m%d-%H%M\'', shell=True)))
         if cf['design'] == 'beauty':
