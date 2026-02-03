@@ -32,7 +32,6 @@
       "os",
       "version",
       "helloworld",
-      "pihole",
       "empty"
    ],
    "component_pihole": {
