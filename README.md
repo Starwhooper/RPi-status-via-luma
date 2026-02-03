@@ -89,17 +89,7 @@ python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.example
 
 #### to start as service ####
 ```bash
-echo [Unit] | sudo tee -a /etc/systemd/system/rpistatus.service
-echo Description=RPi Status via Luma | sudo tee -a /etc/systemd/system/rpistatus.service
-echo After=multi-user.target | sudo tee -a /etc/systemd/system/rpistatus.service
-echo [Service] | sudo tee -a /etc/systemd/system/rpistatus.service
-echo ExecStart=/usr/bin/python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.examples/conf/st7735.conf | sudo tee -a /etc/systemd/system/rpistatus.service
-echo Restart=always | sudo tee -a /etc/systemd/system/rpistatus.service
-echo User=root | sudo tee -a /etc/systemd/system/rpistatus.service
-echo Group=root | sudo tee -a /etc/systemd/system/rpistatus.service
-echo WorkingDirectory=/opt/RPi-status-via-luma | sudo tee -a /etc/systemd/system/rpistatus.service
-echo [Install] | sudo tee -a /etc/systemd/system/rpistatus.service
-echo WantedBy=multi-user.target | sudo tee -a /etc/systemd/system/rpistatus.service
+sudo wget https://raw.githubusercontent.com/Starwhooper/RPi-status-via-luma/blob/main/create%20service/rpistatus.service -O /etc/systemd/system/rpistatus.service
 sudo systemctl enable rpistatus.service
 ```
 (beware to change the ExecStart information as you need)
