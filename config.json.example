@@ -12,7 +12,7 @@
    "boxmarginleft":27,
    "font": {
       "color": "WHITE",
-      "ttf": true,
+      "ttf": false,
       "ttffile": "/opt/luma.examples/examples/fonts/DejaVuSansMono.ttf",
       "ttfsize": 8
    },
