@@ -19,7 +19,7 @@ def render(cf, draw, device, y, font, rectangle_y, term=None):
                     if len(shortenblockeddomain) > 17:
                         shortenblockeddomain = "_" + shortenblockeddomain[-16:]
                 else:
-                    shortenblockeddomain = blockeddomain = 'not recently :-)'
+                    shortenblockeddomain = blockeddomain = '---'
             except Exception:
                 shortenblockeddomain = blockeddomain = "DB ERROR"
                 logging.warning('Pi-Hole block domain unknown')
