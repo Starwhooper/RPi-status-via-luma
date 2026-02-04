@@ -436,13 +436,16 @@ def stats(device):
          if cf['component_pihole']['showlastblockeddomain'] == True:
           try:
            cur.execute("SELECT domain FROM queries WHERE status NOT IN (" + cf['component_pihole']['allowedstatus'] + ") and timestamp >= strftime('%s','now','-5 minute') ORDER BY timestamp DESC LIMIT 1;")
-           blockeddomain = cur.fetchone()[0]
-           shortenblockeddomain = ".".join(blockeddomain.split(".") [-3:])
-           if len(shortenblockeddomain) > 17:
-            #shortenblockeddomain = "\u2026" + shortenblockeddomain[-16:] #…
-            shortenblockeddomain = "_" + shortenblockeddomain[-16:]
+           row = cur.fetchone()
+           if row is not None:
+            blockeddomain = row[0]
+            shortenblockeddomain = ".".join(blockeddomain.split(".") [-3:])
+            if len(shortenblockeddomain) > 17:
+             shortenblockeddomain = "_" + shortenblockeddomain[-16:]
+           else:
+            shortenblockeddomain = blockeddomain = 'not recently :-)'
           except:
-           shortenblockeddomain = "???"
+           shortenblockeddomain = blockeddomain = "DB ERROR"
            logging.warning('Pi-Hole block domain unknown')
           if cf['design'] == 'beauty':
            draw.text((0,y), 'blkd', font = font, fill = cf['font']['color'])
@@ -455,17 +458,29 @@ def stats(device):
          if cf['component_pihole']['showblockedlast24h'] == True:
           try:
            cur.execute("SELECT COUNT(id) FROM queries WHERE status NOT IN (" + cf['component_pihole']['allowedstatus'] + ") and timestamp >= strftime('%s','now','-" + str(cf['component_pihole']['lastblockedhours']) + " hours');")
-           blocked = cur.fetchone()[0]
-           cur.execute("SELECT COUNT(id) FROM queries WHERE timestamp >= strftime('%s','now','-" + str(cf['component_pihole']['lastblockedhours']) + " hours');")
-           all = cur.fetchone()[0]
-           if all > 0:
-            rate = round(blocked / all * 100)
+           row = cur.fetchone()
+           if row is not None:
+            blocked = row[0]
            else:
-            rate = 0
-           string = str(blocked) + ' (' + str(rate) + '%) in ' + str(cf['component_pihole']['lastblockedhours']) + 'h'
+            blocked = 0
           except:
-           string = '??? (??%) in ' + str(cf['component_pihole']['lastblockedhours']) + 'h'
-           logging.warning('Pi-Hole block rate could not calculatet')
+           blocked = 0
+           logging.warning('Pi-Hole found no blocked domain')
+          try:
+           cur.execute("SELECT COUNT(id) FROM queries WHERE timestamp >= strftime('%s','now','-" + str(cf['component_pihole']['lastblockedhours']) + " hours');")
+           row = cur.fetchone()
+           if row is not None:
+            all = row[0]
+           else:
+            all = 0
+          except:
+           all = 0
+           logging.warning('Pi-Hole found no allowed and blocked domain')
+          if all > 0:
+           rate = round(blocked / all * 100)
+          else:
+           rate = 0
+          string = str(blocked) + ' (' + str(rate) + '%) in ' + str(cf['component_pihole']['lastblockedhours']) + 'h'
           if cf['design'] == 'beauty':
            draw.text((0,y), 'blkc', font = font, fill = cf['font']['color'])
            draw.text((cf['boxmarginleft'],y), string, font = font, fill = cf['font']['color'])
