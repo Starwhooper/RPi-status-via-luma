@@ -399,6 +399,18 @@ def stats(device):
           time.sleep(2)
          logging.debug('backup: ' + latest_file_name)
 
+    elif componentname == 'kernelversion':
+         if cf['design'] == 'beauty':
+          import platform
+          kervelversion = platform.release()
+          draw.text((0,y), 'krnl', font = font, fill = cf['font']['color'])
+          draw.text((cf['boxmarginleft'],y), kervelversion, font = font, fill = cf['font']['color'])
+          y += cf['linefeed']
+         if cf['design'] == 'terminal':
+          term.println(string)
+          time.sleep(2)
+         logging.debug('Kervel: ' + kervelversion)
+
     elif componentname == 'helloworld':
          if cf['design'] == 'beauty':
           draw.text((0,y), 'Hello World', font = font, fill = 'Yellow')
@@ -422,28 +434,46 @@ def stats(device):
          con = sqlite3.connect(cf['component_pihole']['dbfile'])
          cur = con.cursor()
          if cf['component_pihole']['showlastblockeddomain'] == True:
-          cur.execute("SELECT domain FROM queries WHERE status NOT IN (" + cf['component_pihole']['allowedstatus'] + ") ORDER BY timestamp DESC LIMIT 1;")
-          blockeddomain = cur.fetchone()[0]
-          blockedbasedomain = ".".join(blockeddomain.split(".") [-3:])
-          string = 'blkd: ' + blockedbasedomain
+          try:
+           cur.execute("SELECT domain FROM queries WHERE status NOT IN (" + cf['component_pihole']['allowedstatus'] + ") and timestamp >= strftime('%s','now','-5 minute') ORDER BY timestamp DESC LIMIT 1;")
+           blockeddomain = cur.fetchone()[0]
+           shortenblockeddomain = ".".join(blockeddomain.split(".") [-3:])
+           if len(shortenblockeddomain) > 17:
+            #shortenblockeddomain = "\u2026" + shortenblockeddomain[-16:] #…
+            shortenblockeddomain = "_" + shortenblockeddomain[-16:]
+          except:
+           shortenblockeddomain = "???"
+           logging.warning('Pi-Hole block domain unknown')
           if cf['design'] == 'beauty':
-           draw.text((0,y), string, font = font, fill = cf['font']['color'])
+           draw.text((0,y), 'blkd', font = font, fill = cf['font']['color'])
+           draw.text((cf['boxmarginleft'],y), shortenblockeddomain, font = font, fill = cf['font']['color'])
            y += cf['linefeed']
           if cf['design'] == 'terminal':
-           term.println(string)
+           term.println('Pi-Hole blocked:' + blockeddomain)
            time.sleep(2)
+          logging.debug('Pi-Hole last blocked domain: ' + blockeddomain)
          if cf['component_pihole']['showblockedlast24h'] == True:
-          cur.execute("SELECT COUNT(id) FROM queries WHERE status NOT IN (" + cf['component_pihole']['allowedstatus'] + ") and timestamp >= strftime('%s','now','-24 hours');")
-          blocked24h = cur.fetchone()
-          string = 'blkc: ' + str(blocked24h[0]) + ' in 24h'
+          try:
+           cur.execute("SELECT COUNT(id) FROM queries WHERE status NOT IN (" + cf['component_pihole']['allowedstatus'] + ") and timestamp >= strftime('%s','now','-" + str(cf['component_pihole']['lastblockedhours']) + " hours');")
+           blocked = cur.fetchone()[0]
+           cur.execute("SELECT COUNT(id) FROM queries WHERE timestamp >= strftime('%s','now','-" + str(cf['component_pihole']['lastblockedhours']) + " hours');")
+           all = cur.fetchone()[0]
+           if all > 0:
+            rate = round(blocked / all * 100)
+           else:
+            rate = 0
+           string = str(blocked) + ' (' + str(rate) + '%) in ' + str(cf['component_pihole']['lastblockedhours']) + 'h'
+          except:
+           string = '??? (??%) in ' + str(cf['component_pihole']['lastblockedhours']) + 'h'
+           logging.warning('Pi-Hole block rate could not calculatet')
           if cf['design'] == 'beauty':
-           draw.text((0,y), string, font = font, fill = cf['font']['color'])
+           draw.text((0,y), 'blkc', font = font, fill = cf['font']['color'])
+           draw.text((cf['boxmarginleft'],y), string, font = font, fill = cf['font']['color'])
            y += cf['linefeed']
           if cf['design'] == 'terminal':
            term.println(string)
            time.sleep(2)
-          
-         logging.debug(' ')
+          logging.debug('Pi-Hole block rate: ' + string)
 
     elif componentname == 'version':
         string = re.sub('[^0-9\-]+', '', str(subprocess.check_output('git -C ' + os.path.split(os.path.abspath(__file__))[0] + ' show -s --format=%cd --date=format:\'%y%m%d-%H%M\'', shell=True)))
@@ -454,7 +484,7 @@ def stats(device):
         if cf['design'] == 'terminal':
          term.println('Version: ' + string)
          time.sleep(2)
-        logging.debug('Version: ' + string)
+        logging.debug('Skript Version: ' + string)
 
     elif componentname == 'drives':
         drivenumber = 0
