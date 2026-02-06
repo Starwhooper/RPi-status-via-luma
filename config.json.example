@@ -42,6 +42,10 @@
 	 "allowedstatus": "0,2,3,12,13,14,17",
      "lastblockedhours": 24
    },
+   "component_mqttstatus": {
+     "mqttuser": "",
+     "mqttpassword": ""
+   },
    "component_checkmac": {
     "mac": "00:00:00:00:00:00"
    },   
