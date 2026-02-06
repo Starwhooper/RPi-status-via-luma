@@ -1,11 +1,11 @@
-echo [Unit]
-echo Description=RPi Status via Luma
-echo After=multi-user.target
-echo [Service]
-echo ExecStart=/usr/bin/python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.examples/conf/st7735.conf
-echo Restart=always
-echo User=root
-echo Group=root
-echo WorkingDirectory=/opt/RPi-status-via-luma
-echo [Install]
-echo WantedBy=multi-user.target
+[Unit]
+Description=RPi Status via Luma
+After=multi-user.target
+[Service]
+ExecStart=/usr/bin/python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.examples/conf/st7735.conf
+Restart=always
+User=root
+Group=root
+WorkingDirectory=/opt/RPi-status-via-luma
+[Install]
+WantedBy=multi-user.target
