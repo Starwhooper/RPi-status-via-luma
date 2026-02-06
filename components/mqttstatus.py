@@ -7,7 +7,7 @@ last_payload = None
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
-        client.subscribe("$SYS/broker/clients/connected")
+        client.subscribe("$SYS/broker/load/messages/publish/1min")
     else:
         print("Verbindungsfehler:", rc)
 
@@ -38,9 +38,9 @@ def render(cf, draw, device, y, font, rectangle_y, term=None):
             draw.text((cf['boxmarginleft'], y), display_text + ' clients', font=font, fill=cf['font']['color'])
             y += cf['linefeed']
         elif cf.get('design') == 'terminal' and term is not None:
-            term.println('MQTT ' + display_text + ' clients')
+            term.println('MQTT ' + display_text + ' pub/min')
             time.sleep(2)
-        logging.debug('MQTT: ' + display_text + ' clients')
+        logging.debug('MQTT: ' + display_text + ' pub/min')
     except Exception:
         logging.exception('Error rendering MQTT payload')
         draw.text((0, y), 'render err', font=font, fill='RED')
