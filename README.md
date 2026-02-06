@@ -89,7 +89,7 @@ python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.example
 
 #### to start as service ####
 ```bash
-sudo wget https://raw.githubusercontent.com/Starwhooper/RPi-status-via-luma/blob/main/create%20service/rpistatus.service -O /etc/systemd/system/rpistatus.service
+sudo wget https://raw.githubusercontent.com/Starwhooper/RPi-status-via-luma/refs/heads/main/create%20service/rpistatus.service -O /etc/systemd/system/rpistatus.service
 sudo systemctl enable rpistatus.service
 ```
 (beware to change the ExecStart information as you need)
