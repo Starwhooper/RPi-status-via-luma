@@ -95,12 +95,14 @@ def render_component(componentname, cf, draw, device, y, font, rectangle_y, term
     return y
     
 ###### set default Font
-if cf['font']['ttf'] == True:
- font = ImageFont.truetype(cf['font']['ttffile'], cf['font']['ttfsize'])
-else:
+font = None
+if cf['font']['ttf'] is True:
+ ttf_file = cf['font']['ttffile']
+ if os.path.exists(ttf_file):
+  font = ImageFont.truetype(ttf_file, cf['font']['ttfsize'])
+if not font:
  font = ImageFont.load_default()
-
-##### max row height
+ logging.error('font ' + ttf_file + ' not found')
 
 ##### do output
 def stats(device):
@@ -139,22 +141,27 @@ def stats(device):
     y += cf['linefeed']
    if len(alert) >= 1:
     if cf['pushover']['messages'] == 1 and datetime.now() >= (lastmessage + timedelta(hours=1)):
-     import requests
-     try:
-      r = requests.post('https://api.pushover.net/1/messages.json', data = {
-          "token": cf['pushover']['apikey'],
-          "user": cf['pushover']['userkey'],
-          "html": 1,
-          "priority": 1,
-          "message": str(socket.gethostname()) + ' ' + alert,
-          }
-      )
-      lastmessage = datetime.now()
-      alert=''
-     except:
-      1
+     pushovermessage()    
   whole_y = y
 
+def pushovermessage():
+ import requests
+ global lastmessage
+ global alert
+ try:
+  r = requests.post('https://api.pushover.net/1/messages.json', data = {
+      "token": cf['pushover']['apikey'],
+      "user": cf['pushover']['userkey'],
+      "html": 1,
+      "priority": 1,
+      "message": str(socket.gethostname()) + ' ' + alert,
+      }
+  )
+  lastmessage = datetime.now()
+  alert=''
+ except:
+  1
+    
 def main():
     while True:
         stats(device)
