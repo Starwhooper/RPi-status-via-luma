@@ -30,12 +30,15 @@ except:
  sys.exit("\033[91m {}\033[00m" .format('any needed package is not aviable. Please check README.md to check which components should be installed".'))
 
 ##### import config.json
+from pathlib import Path
+config_path = Path(__file__).parent / "config.json" 
 try:
- with open(os.path.split(os.path.abspath(__file__))[0] + '/config.json','r') as file:
+ with open(config_path, "r") as file: 
   cf = json.loads(file.read())
+  logging.info('The configuration file ' + str(config_path) + ' loaded.')
 except:
- logging.critical('The configuration file ' + os.path.split(os.path.abspath(__file__))[0] + '/config.json does not exist or has incorrect content.')
- sys.exit("\033[91m {}\033[00m" .format('exit: The configuration file ' + os.path.split(os.path.abspath(__file__))[0] + '/config.json does not exist or has incorrect content. Please rename the file config.json.example to config.json and change the content as required '))
+ logging.critical('The configuration file ' + config_path + ' does not exist or has incorrect content.')
+ sys.exit("\033[91m {}\033[00m" .format('exit: The configuration file ' + config_path + ' does not exist or has incorrect content. Please rename the file config.json.example to config.json and change the content as required '))
 
 ##### configure logging
 try:
