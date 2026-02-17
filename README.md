@@ -44,18 +44,12 @@ sudo reboot
 
 
 ### install required components
-install python 3 components, [luma with examples](https://github.com/rm-hull/luma.examples) and more.
+install python 3 components and more.
 (choose luma.lcd (SPI) or luma.oled (I2C). Or choose booth if you are not sure what you need)
 ```bash
 sudo apt install python3-pip libopenjp2-7 python3-psutil python3-netifaces git -y
 sudo apt install python3-luma.lcd
 sudo apt install python3-luma.oled
-sudo git clone https://github.com/rm-hull/luma.examples /opt/luma.examples
-```
-#### WaveShare 1.4 Hat
-in case of a WareShare 1.4 hat, its nessesary to add a additonal configurationfile to luma
-```bash
-sudo wget https://raw.githubusercontent.com/Starwhooper/luma.examples/patch-1/conf/st7735_128x128_WShat.conf -O /opt/luma.examples/conf/st7735_128x128_WShat.conf
 ```
 
 ### install this tool itself:
@@ -74,18 +68,13 @@ Check https://github.com/Starwhooper/RPi-status-via-luma/wiki/explain-config.jso
 
 in case of 1.8" OLED (SPI):
 ```bash
-python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.examples/conf/st7735.conf
+python3 /opt/RPi-status-via-luma/status.py
 ```
 in case of 0.91" OLED (I2C):
 ```bash
 python3 /opt/RPi-status-via-luma/status.py --rotate 3  -d ssd1306 --height 32
 ```
 if you get the response _status.py: error: I2C device not found: /dev/i2c-1_ you need to add the parameter --i2c-port 0
-
-in case of 1.44" Waveshare (SPI):
-```bash
-python3 /opt/RPi-status-via-luma/status.py --rotate 3 --config /opt/luma.examples/conf/st7735_128x128_WShat.conf
-```
 
 #### to start as service ####
 ```bash
