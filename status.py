@@ -35,29 +35,21 @@ except:
  sys.exit("\033[91m {}\033[00m" .format('any needed package is not aviable. Please check README.md to check which components should be installed".'))
 
 ##### import config.json
-
 config_path = Path(__file__).parent / "config.json" 
 try:
  with open(config_path, "r") as file: 
   cf = json.loads(file.read())
-  logging.info('The configuration file ' + str(config_path) + ' loaded.')
 except:
- logging.critical('The configuration file ' + config_path + ' does not exist or has incorrect content.')
  sys.exit("\033[91m {}\033[00m" .format('exit: The configuration file ' + config_path + ' does not exist or has incorrect content. Please rename the file config.json.example to config.json and change the content as required '))
 
 ##### configure logging
 try:
-# if cf['logging']['level'] == "debug": logging_level = logging.DEBUG
-# elif cf['logging']['level'] == "info": logging_level = logging.INFO
-# elif cf['logging']['level'] == "error": logging_level = logging.ERROR
-# elif cf['logging']['level'] == "critical": logging_level = logging.CRITICAL
-# else: logging_level = logging.WARNING
  logging_level = {
-     "debug": logging.DEBUG,
-     "info": logging.INFO,
-     "warning": logging.WARNING,
-     "error": logging.ERROR,
-     "critical": logging.CRITICAL,
+  "debug": logging.DEBUG,
+  "info": logging.INFO,
+  "warning": logging.WARNING,
+  "error": logging.ERROR,
+  "critical": logging.CRITICAL,
  }.get(cf['logging']['level'], logging.WARNING)
 except:
  logging_level = logging.WARNING
@@ -83,11 +75,7 @@ def valuetocolor(value,translation):
  return(color)
 
 def render_component(componentname, cf, draw, device, y, font, rectangle_y, term=None):
-    """
-    Lädt components.<componentname> und ruft dessen render(cf, draw, device, y, font, rectangle_y, term) auf.
-    Gibt den neuen y-Wert zurück (oder den unveränderten y bei Fehler).
-    """
-    
+#    Lädt components.<componentname> und ruft dessen render(cf, draw, device, y, font, rectangle_y, term) auf.     Gibt den neuen y-Wert zurück (oder den unveränderten y bei Fehler).
     try:
         module = importlib.import_module(f'components.{componentname}')
         return module.render(cf, draw, device, y, font, rectangle_y, term)
@@ -107,9 +95,10 @@ if cf['font']['ttf'] is True:
  ttf_file = cf['font']['ttffile']
  if os.path.exists(ttf_file):
   font = ImageFont.truetype(ttf_file, cf['font']['ttfsize'])
+ else:
+  logging.error('font ' + ttf_file + ' not found')
 if not font:
  font = ImageFont.load_default()
- logging.error('font ' + ttf_file + ' not found')
 
 ##### do output
 def stats(device):
