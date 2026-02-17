@@ -13,7 +13,7 @@
    "font": {
       "color": "WHITE",
       "ttf": false,
-      "ttffile": "/opt/luma.examples/examples/fonts/DejaVuSansMono.ttf",
+      "ttffile": "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
       "ttfsize": 8
    },
    "imagerefresh":0.2,
