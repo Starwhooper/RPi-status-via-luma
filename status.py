@@ -18,7 +18,9 @@
 ##### check if all required packages are aviable
 try:
  from luma.core.render import canvas
- from PIL import ImageFont
+ from luma.core.interface.serial import spi
+ from luma.lcd.device import st7735
+ from PIL import Image, ImageDraw, ImageFont
  from datetime import datetime, timedelta
  import json
  import logging
@@ -42,11 +44,18 @@ except:
 
 ##### configure logging
 try:
- if cf['logging']['level'] == "debug": logging_level = logging.DEBUG
- elif cf['logging']['level'] == "info": logging_level = logging.INFO
- elif cf['logging']['level'] == "error": logging_level = logging.ERROR
- elif cf['logging']['level'] == "critical": logging_level = logging.CRITICAL
- else: logging_level = logging.WARNING
+# if cf['logging']['level'] == "debug": logging_level = logging.DEBUG
+# elif cf['logging']['level'] == "info": logging_level = logging.INFO
+# elif cf['logging']['level'] == "error": logging_level = logging.ERROR
+# elif cf['logging']['level'] == "critical": logging_level = logging.CRITICAL
+# else: logging_level = logging.WARNING
+ logging_level = {
+     "debug": logging.DEBUG,
+     "info": logging.INFO,
+     "warning": logging.WARNING,
+     "error": logging.ERROR,
+     "critical": logging.CRITICAL,
+ }.get(cf['logging']['level'], logging.WARNING)
 except:
  logging_level = logging.WARNING
 
@@ -61,14 +70,6 @@ logging.basicConfig(
  encoding='utf-8',
  format='%(asctime)s:%(levelname)s:%(message)s'
 )
-
-##### import module demo_opts from luma.examples
-try:
- sys.path.append(cf['luma']['demo_opts.py']['folder'])
- from demo_opts import get_device
-except:
- sys.exit("\033[91m {}\033[00m" .format('file ' + cf['luma']['demo_opts.py']['folder'] + '/demo_opts.py not found. Please check config.json or do sudo git clone https://github.com/rm-hull/luma.examples /opt/luma.examples'))
- logging.critical(format('file ' + cf['luma']['demo_opts.py']['folder'] + '/demo_opts.py not found.'))
 
 ######own functions
 def valuetocolor(value,translation):
@@ -170,10 +171,24 @@ def main():
         stats(device)
         time.sleep(cf['imagerefresh'])
 
-
 if __name__ == '__main__':
-    try:
-        device = get_device()
-        main()
-    except KeyboardInterrupt:
-        pass
+ try:
+  serial = spi(
+   port=0,
+   device=0,
+   gpio_DC=23,
+   gpio_RST=24,
+   bus_speed_hz=32000000
+  )
+  
+  device = st7735(
+   serial,
+   width=160,
+   height=128,
+   gpio_LIGHT=18,
+   active_low=False,   # backlight-active=high
+   rotate=3
+  )
+  main()
+ except KeyboardInterrupt:
+     pass
