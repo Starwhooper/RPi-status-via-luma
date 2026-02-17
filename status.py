@@ -22,13 +22,14 @@ try:
  from luma.core.interface.serial import spi
  from luma.lcd.device import st7735
  from pathlib import Path
- from PIL import Image, ImageDraw, ImageFont
- import importlib
+# from PIL import Image, ImageDraw, ImageFont
+ from functions import defaultfont, render_component, pushovermessage #,valuetocolor
+# import importlib
  import json
  import logging
- import os
- import requests
- import socket
+# import os
+# import requests
+# import socket
  import sys
  import time
 except:
@@ -66,40 +67,6 @@ logging.basicConfig(
  format='%(asctime)s:%(levelname)s:%(message)s'
 )
 
-######own functions
-def valuetocolor(value,translation):
- for t in translation:
-    if value >= t[0]:
-        color = t[1]
-        break;
- return(color)
-
-def render_component(componentname, cf, draw, device, y, font, rectangle_y, term=None):
-#    Lädt components.<componentname> und ruft dessen render(cf, draw, device, y, font, rectangle_y, term) auf.     Gibt den neuen y-Wert zurück (oder den unveränderten y bei Fehler).
-    try:
-        module = importlib.import_module(f'components.{componentname}')
-        return module.render(cf, draw, device, y, font, rectangle_y, term)
-    except ModuleNotFoundError:
-        draw.text((0, y), f'MISS {componentname}', font=font, fill='RED')
-        y += cf['linefeed']
-        logging.error('components.%s module not found', componentname)
-    except Exception as e:
-        draw.text((0, y), f'{componentname} error', font=font, fill='RED')
-        y += cf['linefeed']
-        logging.exception('Error while rendering %s component: %s', componentname, e)
-    return y
-    
-###### set default Font
-font = None
-if cf['font']['ttf'] is True:
- ttf_file = cf['font']['ttffile']
- if os.path.exists(ttf_file):
-  font = ImageFont.truetype(ttf_file, cf['font']['ttfsize'])
- else:
-  logging.error('font ' + ttf_file + ' not found')
-if not font:
- font = ImageFont.load_default()
-
 ##### do output
 def stats(device):
  global lastmessage
@@ -110,6 +77,7 @@ def stats(device):
   logging.critical('maybe restart?')
   lastmessage = datetime(1977, 1, 1)
 
+ font = defaultfont(cf)
  with canvas(device, dither=True) as draw:
   if cf['design'] == 'terminal':
    term = terminal(device, font)
@@ -137,26 +105,10 @@ def stats(device):
     y += cf['linefeed']
    if len(alert) >= 1:
     if cf['pushover']['messages'] == 1 and datetime.now() >= (lastmessage + timedelta(hours=1)):
-     pushovermessage()    
+     pushovermessage(cf,alert)
+     lastmessage = datetime.now()     
+     alert=''
   whole_y = y
-
-def pushovermessage():
- 
- global lastmessage
- global alert
- try:
-  r = requests.post('https://api.pushover.net/1/messages.json', data = {
-      "token": cf['pushover']['apikey'],
-      "user": cf['pushover']['userkey'],
-      "html": 1,
-      "priority": 1,
-      "message": str(socket.gethostname()) + ' ' + alert,
-      }
-  )
-  lastmessage = datetime.now()
-  alert=''
- except:
-  1
 
 def init_display():
     serial = spi(
