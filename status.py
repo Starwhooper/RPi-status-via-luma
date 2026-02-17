@@ -17,14 +17,17 @@
 
 ##### check if all required packages are aviable
 try:
+ from datetime import datetime, timedelta
  from luma.core.render import canvas
  from luma.core.interface.serial import spi
  from luma.lcd.device import st7735
+ from pathlib import Path
  from PIL import Image, ImageDraw, ImageFont
- from datetime import datetime, timedelta
+ import importlib
  import json
  import logging
  import os
+ import requests
  import socket
  import sys
  import time
@@ -32,7 +35,7 @@ except:
  sys.exit("\033[91m {}\033[00m" .format('any needed package is not aviable. Please check README.md to check which components should be installed".'))
 
 ##### import config.json
-from pathlib import Path
+
 config_path = Path(__file__).parent / "config.json" 
 try:
  with open(config_path, "r") as file: 
@@ -84,7 +87,7 @@ def render_component(componentname, cf, draw, device, y, font, rectangle_y, term
     Lädt components.<componentname> und ruft dessen render(cf, draw, device, y, font, rectangle_y, term) auf.
     Gibt den neuen y-Wert zurück (oder den unveränderten y bei Fehler).
     """
-    import importlib
+    
     try:
         module = importlib.import_module(f'components.{componentname}')
         return module.render(cf, draw, device, y, font, rectangle_y, term)
@@ -127,7 +130,7 @@ def stats(device):
   try: whole_y
   except: whole_y = 0
 
-  if whole_y >= device.height:
+  if whole_y > device.height:
    try: offset_y = offset_y -1
    except: offset_y = 0
   else: offset_y = 0
@@ -149,7 +152,7 @@ def stats(device):
   whole_y = y
 
 def pushovermessage():
- import requests
+ 
  global lastmessage
  global alert
  try:
@@ -165,30 +168,33 @@ def pushovermessage():
   alert=''
  except:
   1
-    
-def main():
+
+def init_display():
+    serial = spi(
+        port=0,
+        device=0,
+        gpio_DC=23,
+        gpio_RST=24,
+        bus_speed_hz=32000000
+    )
+    device = st7735(
+        serial,
+        width=160,
+        height=128,
+        gpio_LIGHT=18,
+        active_low=False,
+        rotate=3
+    )
+    return device
+
+def main(device):
     while True:
         stats(device)
         time.sleep(cf['imagerefresh'])
 
 if __name__ == '__main__':
  try:
-  serial = spi(
-   port=0,
-   device=0,
-   gpio_DC=23,
-   gpio_RST=24,
-   bus_speed_hz=32000000
-  )
-  
-  device = st7735(
-   serial,
-   width=160,
-   height=128,
-   gpio_LIGHT=18,
-   active_low=False,   # backlight-active=high
-   rotate=3
-  )
-  main()
+  device = init_display()
+  main(device)
  except KeyboardInterrupt:
-     pass
+  pass
