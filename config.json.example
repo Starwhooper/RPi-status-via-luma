@@ -58,7 +58,7 @@
    "component_hostname": {
     "font": {
       "default": false,
-      "ttffile": "/opt/luma.examples/examples/fonts/code2000.ttf",
+      "ttffile": "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
       "size": 16
     }
    },
