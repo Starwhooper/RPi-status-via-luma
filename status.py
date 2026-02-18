@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Creator: Thiemo Schuff, thiemo@schuff.eu
+# Creator: Thiemo Schuff
 # Source: https://github.com/Starwhooper/RPi-status-via-luna
 
 #######################################################
@@ -45,70 +45,19 @@ except:
 
 ##### configure logging
 try:
- logging_level = {
-  "debug": logging.DEBUG,
-  "info": logging.INFO,
-  "warning": logging.WARNING,
-  "error": logging.ERROR,
-  "critical": logging.CRITICAL,
- }.get(cf['logging']['level'], logging.WARNING)
+ logging_level = {"debug": logging.DEBUG, "info": logging.INFO, "warning": logging.WARNING, "error": logging.ERROR, "critical": logging.CRITICAL, }.get(cf['logging']['level'], logging.WARNING)
 except:
  logging_level = logging.WARNING
-
 try:
  logging_file = cf['logging']['file']
 except:
  logging_file = '/var/log/rpistatusvialuma.log'
 logging.getLogger("urllib3")
-logging.basicConfig(
- filename=logging_file,
- level=logging_level,
- encoding='utf-8',
- format='%(asctime)s:%(levelname)s:%(message)s'
-)
+logging.basicConfig(filename=logging_file, level=logging_level, encoding='utf-8', format='%(asctime)s:%(levelname)s:%(message)s')
 
-##### do output
-def stats(device):
- global lastmessage
- global alert
- try: lastmessage
- except:
-  alert='maybe restart?'
-  logging.critical('maybe restart?')
-  lastmessage = datetime(1977, 1, 1)
-
- font = defaultfont(cf)
- with canvas(device, dither=True) as draw:
-  if cf['design'] == 'terminal':
-   term = terminal(device, font)
-  global whole_y
-  global offset_y
-
-  try: whole_y
-  except: whole_y = 0
-
-  if whole_y > device.height:
-   try: offset_y = offset_y -1
-   except: offset_y = 0
-  else: offset_y = 0
-  y=1 + offset_y
-
-  #calculate max row height
-  rectangle_y = draw.textbbox(xy=(0,0), text='AQjgp,;Ä', font=font)[3]
-
-  #check all components
-  for componentname in cf['components']:
-   try:
-    y = render_component(componentname, cf, draw, device, y, font, rectangle_y, term if 'term' in locals() else None)
-   except:
-    draw.text((0,y), 'ERR ' + componentname, font = font, fill = 'RED')
-    y += cf['linefeed']
-   if len(alert) >= 1:
-    if cf['pushover']['messages'] == 1 and datetime.now() >= (lastmessage + timedelta(hours=1)):
-     pushovermessage(cf,alert)
-     lastmessage = datetime.now()     
-     alert=''
-  whole_y = y
+# global definieren
+lastmessagetime = datetime(1977, 1, 1)
+alert=''
 
 def init_display():
     serial = spi(
@@ -130,7 +79,51 @@ def init_display():
 
 def main(device):
     while True:
-        stats(device)
+        global lastmessagetime
+        global alert
+        global whole_y
+        global offset_y
+        global stayontop
+        global stayonbottom
+        
+        if (lastmessagetime == datetime(1977, 1, 1)): alert='maybe restart?'
+        whole_y = globals().get("whole_y", 0) #whole_y = 0 wenn bisher ungenutzt
+        stayontop = globals().get("stayontop", 0) #whole_y = 0 wenn bisher ungenutzt
+        stayonbottom = globals().get("stayonbottom", 0) #whole_y = 0 wenn bisher ungenutzt
+        offset_y = globals().get("offset_y", 0) #whole_y = 0 wenn bisher ungenutzt
+       
+        font = defaultfont(cf)
+        with canvas(device, dither=True) as draw:
+         if cf['design'] == 'terminal': term = terminal(device, font)
+         
+         #scroll
+         if whole_y > device.height: 
+          if stayontop > 5: offset_y -= 1
+          else: stayontop += 1
+         else: 
+          if stayonbottom > 5: 
+           offset_y = 0
+           stayontop = 0
+           stayonbottom = 0
+          else: stayonbottom += 1
+         y = 0 + offset_y
+       
+         #calculate max row height
+         rectangle_y = draw.textbbox(xy=(0,0), text='AQjgp,;Ä', font=font)[3]
+       
+         #check all components
+         for componentname in cf['components']:
+          try:
+           y = render_component(componentname, cf, draw, device, y, font, rectangle_y, term if 'term' in locals() else None)
+          except:
+           draw.text((0,y), 'ERR ' + componentname, font = font, fill = 'RED')
+           y += cf['linefeed']
+          if alert:
+           if cf['pushover']['messages'] == True and datetime.now() >= (lastmessagetime + timedelta(hours=1)):
+            pushovermessage(cf,alert)
+            lastmessagetime = datetime.now()     
+            alert = ''
+         whole_y = y
         time.sleep(cf['imagerefresh'])
 
 if __name__ == '__main__':
