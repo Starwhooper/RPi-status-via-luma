@@ -28,7 +28,7 @@ def render_component(componentname, cf, draw, device, y, font, rectangle_y, term
 #    Lädt components.<componentname> und ruft dessen render(cf, draw, device, y, font, rectangle_y, term) auf.     Gibt den neuen y-Wert zurück (oder den unveränderten y bei Fehler).
  try:
   module = importlib.import_module(f'components.{componentname}')
-  return module.render(cf, draw, device, y, font, rectangle_y, term)
+  return module.render(cf, draw, device, y, font, rectangle_y, term=None)
  except ModuleNotFoundError:
   draw.text((0, y), f'MISS {componentname}', font=font, fill='RED')
   y += cf['linefeed']
