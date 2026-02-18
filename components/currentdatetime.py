@@ -1,20 +1,27 @@
 from datetime import datetime
-import time
 import logging
 
-def render(cf, draw, device, y, font, rectangle_y, term=None):
+def render(cf, draw, device, y, font, rectangle_y=None, term=None):
     try:
-        string = '{:%a,%d.%b\'%y %H:%M:%S}'.format(datetime.now())
+        # Datum/Zeit formatiert
+        now = datetime.now()
+        string = now.strftime("%a,%d.%b'%y %H:%M:%S")
+
+        # Deutsche Abkürzung korrigieren (Mo, Di, Mi…)
         string = string.replace(string[:3], string[:2])
-        if cf.get('design') == 'beauty':
-            draw.text((0, y), string, font=font, fill=cf['font']['color'])
-            y += cf['linefeed']
-        elif cf.get('design') == 'terminal' and term is not None:
-            term.println('Date: ' + string)
-            time.sleep(2)
-        logging.debug('Date: %s', string)
+
+        # Text zeichnen
+        color = cf.get('font', {}).get('color', 'white')
+        linefeed = cf.get('linefeed', 8)
+
+        draw.text((0, y), string, font=font, fill=color)
+        y += linefeed
+
+        logging.debug("Date: %s", string)
+
     except Exception:
-        logging.exception('Error rendering currentdatetime')
-        draw.text((0, y), 'datetime err', font=font, fill='RED')
+        logging.exception("Error rendering currentdatetime")
+        draw.text((0, y), "datetime err", font=font, fill="RED")
         y += cf.get('linefeed', 8)
+
     return y
