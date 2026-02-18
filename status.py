@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Creator: Thiemo Schuff
+# Creator: Thiemo Schuff, thiemo@schuff.eu
 # Source: https://github.com/Starwhooper/RPi-status-via-luna
 
 #######################################################
@@ -94,7 +94,7 @@ def main(device):
        
         font = defaultfont(cf)
         with canvas(device, dither=True) as draw:
-         if cf['design'] == 'terminal': term = terminal(device, font)
+         #if cf['design'] == 'terminal': term = terminal(device, font)
          
          #scroll
          if whole_y > device.height: 
@@ -114,7 +114,8 @@ def main(device):
          #check all components
          for componentname in cf['components']:
           try:
-           y = render_component(componentname, cf, draw, device, y, font, rectangle_y, term if 'term' in locals() else None)
+           y = render_component(componentname, cf, draw, device, y, font, rectangle_y, term=None)
+           #y = render_component(componentname, cf, draw, device, y, font, rectangle_y, term if 'term' in locals() else None)
           except:
            draw.text((0,y), 'ERR ' + componentname, font = font, fill = 'RED')
            y += cf['linefeed']
