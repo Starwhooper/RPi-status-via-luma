@@ -4,35 +4,53 @@ import time
 import os
 from PIL import ImageFont
 
-def render(cf, draw, device, y, font, rectangle_y, term=None):
- try:
-  hostname_font = ttffile = ttfsize = defaultfont = None
-  
-  hostname = str(socket.gethostname()).upper()
-  if cf.get('design') == 'beauty':
-#check if ttf requested and needed
-   try:
-    ttffile = cf['component_hostname']['font']['ttffile']
-    ttfsize = cf['component_hostname']['font']['size']
-    defaultfont = cf['component_hostname']['font']['default']
-    if ( cf['component_hostname']['font']['default'] is False and os.path.exists(ttffile) ):
-     hostname_font = ImageFont.truetype(ttffile, ttfsize) 
-    else:
-     pass #hostname_font = ImageFont.load_default()
-   except Exception:
-    logging.exception('font ' + str(ttffile) + ' size ' + str(ttfsize) + ' error')
-   if not hostname_font: hostname_font = ImageFont.load_default()
+def render(cf, draw, device, y, font, rectangle_y=None, term=None):
+    try:
+        hostname = socket.gethostname().upper()
 
-   text_x = (device.width - draw.textbbox(xy=(0,0), text=hostname, font=hostname_font)[2]) / 2
-   text_y = draw.textbbox(xy=(0,0), text=hostname, font=hostname_font)[3]
-   draw.text((text_x, y), hostname, font=hostname_font, fill='Yellow')
-   y += text_y
-  elif cf.get('design') == 'terminal' and term is not None:
-      term.println('Hostname: ' + hostname)
-      time.sleep(2)
-  logging.debug('Hostname: %s', hostname)
- except Exception:
-     logging.exception('Error rendering hostname')
-     draw.text((0, y), 'hostname err', font=font, fill='RED')
-     y += cf.get('linefeed', 8)
- return y
+        # BEAUTY MODE
+        if cf.get('design') == 'beauty':
+            hostname_font = None
+
+            # Font-Konfiguration lesen
+            font_cfg = cf.get('component_hostname', {}).get('font', {})
+            ttffile = font_cfg.get('ttffile')
+            ttfsize = font_cfg.get('size')
+            use_default = font_cfg.get('default', True)
+
+            # TTF laden, falls gewünscht
+            if not use_default and ttffile and os.path.exists(ttffile):
+                try:
+                    hostname_font = ImageFont.truetype(ttffile, ttfsize)
+                except Exception:
+                    logging.exception(f"Error loading font '{ttffile}' size {ttfsize}")
+
+            # Fallback
+            if not hostname_font:
+                hostname_font = ImageFont.load_default()
+
+            # Textmaße bestimmen
+            bbox = draw.textbbox((0, 0), hostname, font=hostname_font)
+            text_w = bbox[2] - bbox[0]
+            text_h = bbox[3] - bbox[1]
+
+            # Zentrieren
+            text_x = (device.width - text_w) // 2
+
+            # Zeichnen
+            draw.text((text_x, y -2), hostname, font=hostname_font, fill='Yellow')
+            y += text_h
+
+        # TERMINAL MODE
+        elif cf.get('design') == 'terminal' and term is not None:
+            term.println(f"Hostname: {hostname}")
+            time.sleep(2)
+
+        logging.debug('Hostname: %s', hostname)
+
+    except Exception:
+        logging.exception('Error rendering hostname')
+        draw.text((0, y), 'hostname err', font=font, fill='RED')
+        y += cf.get('linefeed', 8)
+
+    return y
