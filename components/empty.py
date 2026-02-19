@@ -1,6 +1,6 @@
 import logging
 
-def render(cf, draw, device, y, font, rectangle_y, term=None):
+def render(cf, draw, device, y, font, rectangle_y=None, term=None):
     try:
         # Leere Zeile (nur Abstand)
         y += cf['linefeed']
