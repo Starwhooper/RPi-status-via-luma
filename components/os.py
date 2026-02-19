@@ -1,31 +1,47 @@
 import logging
 
-def render(cf, draw, device, y, font, rectangle_y, term=None):
-        def get_os_release():
-            os_info = {}
-            with open("/etc/os-release", "r") as file:
-                for line in file:
-                    key, _, value = line.partition("=")
-                    os_info[key.strip()] = value.strip().strip('"')
-            return os_info
+def load_os_info():
+    try:
+        # /etc/os-release lesen
+        os_info = {}
+        with open("/etc/os-release", "r") as f:
+            for line in f:
+                key, _, value = line.partition("=")
+                os_info[key.strip()] = value.strip().strip('"')
 
-        def get_debian_version():
-            with open('/etc/debian_version', 'r') as file:
-                return file.read().strip()
+        # Debian-Version lesen
+        try:
+            with open("/etc/debian_version", "r") as f:
+                debian_version = f.read().strip()
+        except Exception:
+            debian_version = "unknown"
 
+        # Ausgabe zusammenbauen
+        codename = os_info.get("VERSION_CODENAME", "unknown")
+        os_version_name = f"{debian_version} ({codename})"
 
-        os_info = get_os_release()
-        debian_version = get_debian_version()
+        return os_version_name
 
-        os_version_name = f"{debian_version} ({os_info.get('VERSION_CODENAME', 'unknown')})"
+    except Exception as e:
+        logging.error(f"OS info lookup failed: {e}")
+        return "unknown"
 
-        if cf['design'] == 'beauty':
-            draw.text((0, y), 'OS', font=font, fill=cf['font']['color'])
-            draw.text((cf['boxmarginleft'], y), os_version_name, font=font, fill=cf['font']['color'])
-            y += cf['linefeed']
-        elif cf['design'] == 'terminal':
-            term.println(f"OS: {os_version_name}")
-            time.sleep(2)
+# globaler Cache
+OS_VERSION_NAME = load_os_info()
 
-        logging.debug(f"OS: {os_version_name}")
-        return y
+def render(cf, draw, device, y, font, rectangle_y=None, term=None):
+    try:
+        font_color = cf['font']['color']
+        linefeed = cf['linefeed']
+        box_left = cf['boxmarginleft']
+
+        draw.text((0, y), "OS", font=font, fill=font_color)
+        draw.text((box_left, y), OS_VERSION_NAME, font=font, fill=font_color)
+
+        logging.debug(f"OS: {OS_VERSION_NAME}")
+        return y + linefeed
+
+    except Exception:
+        logging.exception("Error rendering OS info")
+        draw.text((0, y), "OS err", font=font, fill="RED")
+        return y + cf.get("linefeed", 8)
