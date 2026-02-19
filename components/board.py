@@ -5,7 +5,6 @@ import logging
 _BOARD_INFO_CACHE = None
 
 def _get_board_information():
-
     global _BOARD_INFO_CACHE
     
     if _BOARD_INFO_CACHE is not None:
@@ -36,7 +35,6 @@ def _get_board_information():
         _BOARD_INFO_CACHE = 'unknown'
     
     return _BOARD_INFO_CACHE
-
 
 def render(cf, draw, device, y, font, rectangle_y=None, term=None):
 
