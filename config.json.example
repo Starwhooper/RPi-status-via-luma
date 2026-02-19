@@ -20,7 +20,7 @@
       "refresh": 0.2,
 	  "toplimit": 10,
 	  "bottomlimit": 10,
-      "savepath": "/tmp/image_%Y%m%d_%H%M%S.png"
+      "savepath": "/tmp/image_%Y%m.png"
    },
    "linefeed":10,
    "components":[
