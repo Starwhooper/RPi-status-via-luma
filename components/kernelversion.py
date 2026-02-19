@@ -1,20 +1,31 @@
 import platform
 import logging
-import time
 
-def render(cf, draw, device, y, font, rectangle_y, term=None):
+def get_kernel_short():
     try:
-        kervelversion = platform.release()
-        if cf.get('design') == 'beauty':
-            draw.text((0, y), 'krnl', font=font, fill=cf['font']['color'])
-            draw.text((cf['boxmarginleft'], y), kervelversion, font=font, fill=cf['font']['color'])
-            y += cf['linefeed']
-        elif cf.get('design') == 'terminal' and term is not None:
-            term.println('Kernel: ' + kervelversion)
-            time.sleep(2)
-        logging.debug('Kernel: %s', kervelversion)
+        full = platform.release()              # z.B. "6.1.0-18-rpi-v8"
+        short = full.split('-')[0]             # → "6.1.0"
+        return full, short
+    except Exception as e:
+        logging.error(f"Kernel lookup failed: {e}")
+        return "unknown", "unknown"
+
+# globale Cache-Variablen
+KERNEL_FULL, KERNEL_SHORT = get_kernel_short()
+
+def render(cf, draw, device, y, font, rectangle_y=None, term=None):
+    try:
+        font_color = cf['font']['color']
+        linefeed = cf['linefeed']
+        box_left = cf['boxmarginleft']
+
+        draw.text((0, y), "krnl", font=font, fill=font_color)
+        draw.text((box_left, y), KERNEL_SHORT, font=font, fill=font_color)
+
+        logging.debug("Kernel: %s", KERNEL_FULL)
+        return y + linefeed
+
     except Exception:
-        logging.exception('Error rendering kernelversion')
-        draw.text((0, y), 'krnl err', font=font, fill='RED')
-        y += cf.get('linefeed', 8)
-    return y
+        logging.exception("Error rendering kernelversion")
+        draw.text((0, y), "krnl err", font=font, fill="RED")
+        return y + cf.get("linefeed", 8)
