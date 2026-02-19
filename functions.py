@@ -1,10 +1,10 @@
 ####provide a color to a value. As example you provide 100, you will get red
-#def valuetocolor(value,translation):
-# for t in translation:
-#    if value >= t[0]:
-#        color = t[1]
-#        break;
-# return(color)
+def valuetocolor(value,translation):
+ for t in translation:
+    if value >= t[0]:
+        color = t[1]
+        break;
+ return(color)
 
 ####try to use a ttf, otherwise default font
 def defaultfont(cf):
