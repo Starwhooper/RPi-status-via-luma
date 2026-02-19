@@ -104,7 +104,6 @@ def main(device):
          for componentname in cf['components']:
           try:
            y = render_component(componentname, cf, draw, device, y, font, rectangle_y, term=None)
-           #y = render_component(componentname, cf, draw, device, y, font, rectangle_y, term if 'term' in locals() else None)
           except:
            draw.text((0,y), 'ERR ' + componentname, font = font, fill = 'RED')
            y += cf['linefeed']
@@ -116,7 +115,7 @@ def main(device):
          whole_y = y
          
          # --- Bild speichern alle 5 Minuten --- 
-         if datetime.now() >= lastsave + timedelta(minutes=5): 
+         if (datetime.now() >= lastsave + timedelta(minutes=5) and offset_y == 0): 
              filename = datetime.now().strftime(imagesavepath) 
              img = draw._image.copy() 
              img.save(filename) 
