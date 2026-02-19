@@ -23,7 +23,7 @@ try:
  from luma.lcd.device import st7735
  from pathlib import Path
 # from PIL import Image, ImageDraw, ImageFont
- from functions import defaultfont, render_component, pushovermessage #,valuetocolor
+ from functions import defaultfont, render_component, pushovermessage, scrollimage #,valuetocolor
 # import importlib
  import json
  import logging
@@ -77,7 +77,31 @@ def init_display():
     )
     return device
 
+#def handle_scroll(whole_y, device_height, offset_y, stayontop, stayonbottom):
+#    # Wenn der Inhalt höher ist als das Display → nach oben scrollen
+#    if whole_y > device_height:
+#        if stayontop > 5:
+#            offset_y -= 1
+#        else:
+#            stayontop += 1
+#    else:
+#        # Wenn unten angekommen → Reset
+#        if stayonbottom > 5:
+#            offset_y = 0
+#            stayontop = 0
+#            stayonbottom = 0
+#        else:
+#            stayonbottom += 1
+#
+#    y = offset_y
+#    return offset_y, stayontop, stayonbottom, y
+
+
+
 def main(device):
+    toplimit = cf.get('image', {}).get('toplimit', 0)
+    bottomlimit = cf.get('image', {}).get('bottomlimit', 0)
+    imagerefresh = cf.get('image', {}).get('refresh', 0)
     while True:
         global lastmessagetime
         global alert
@@ -94,19 +118,7 @@ def main(device):
        
         font = defaultfont(cf)
         with canvas(device, dither=True) as draw:
-         #if cf['design'] == 'terminal': term = terminal(device, font)
-         
-         #scroll
-         if whole_y > device.height: 
-          if stayontop > 5: offset_y -= 1
-          else: stayontop += 1
-         else: 
-          if stayonbottom > 5: 
-           offset_y = 0
-           stayontop = 0
-           stayonbottom = 0
-          else: stayonbottom += 1
-         y = 0 + offset_y
+         offset_y, stayontop, stayonbottom, y = scrollimage( whole_y, device.height, offset_y, stayontop, stayonbottom, toplimit, bottomlimit )
        
          #calculate max row height
          rectangle_y = draw.textbbox(xy=(0,0), text='AQjgp,;Ä', font=font)[3]
@@ -125,7 +137,7 @@ def main(device):
             lastmessagetime = datetime.now()     
             alert = ''
          whole_y = y
-        time.sleep(cf['imagerefresh'])
+        time.sleep(imagerefresh)
 
 if __name__ == '__main__':
  try:
