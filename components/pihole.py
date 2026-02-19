@@ -1,8 +1,7 @@
 import sqlite3
 import logging
-import time
 
-def render(cf, draw, device, y, font, rectangle_y, term=None):
+def render(cf, draw, device, y, font, rectangle_y=None, term=None):
     try:
         dbfile = cf.get('component_pihole', {}).get('dbfile')
         if not dbfile:
@@ -23,13 +22,9 @@ def render(cf, draw, device, y, font, rectangle_y, term=None):
             except Exception:
                 shortenblockeddomain = blockeddomain = "DB ERROR"
                 logging.warning('Pi-Hole block domain unknown')
-            if cf.get('design') == 'beauty':
-                draw.text((0, y), 'blkd', font=font, fill=cf['font']['color'])
-                draw.text((cf['boxmarginleft'], y), shortenblockeddomain, font=font, fill=cf['font']['color'])
-                y += cf['linefeed']
-            elif cf.get('design') == 'terminal' and term is not None:
-                term.println('Pi-Hole blocked:' + blockeddomain)
-                time.sleep(2)
+            draw.text((0, y), 'blkd', font=font, fill=cf['font']['color'])
+            draw.text((cf['boxmarginleft'], y), shortenblockeddomain, font=font, fill=cf['font']['color'])
+            y += cf['linefeed']
             logging.debug('Pi-Hole last blocked domain: %s', blockeddomain)
 
         if cf.get('component_pihole', {}).get('showblockedlast24h', False):
@@ -49,13 +44,9 @@ def render(cf, draw, device, y, font, rectangle_y, term=None):
                 logging.warning('Pi-Hole found no allowed and blocked domain')
             rate = round(blocked / allq * 100) if allq > 0 else 0
             string = f"{blocked} ({rate}%) in {cf['component_pihole'].get('lastblockedhours',24)}h"
-            if cf.get('design') == 'beauty':
-                draw.text((0, y), 'blkc', font=font, fill=cf['font']['color'])
-                draw.text((cf['boxmarginleft'], y), string, font=font, fill=cf['font']['color'])
-                y += cf['linefeed']
-            elif cf.get('design') == 'terminal' and term is not None:
-                term.println(string)
-                time.sleep(2)
+            draw.text((0, y), 'blkc', font=font, fill=cf['font']['color'])
+            draw.text((cf['boxmarginleft'], y), string, font=font, fill=cf['font']['color'])
+            y += cf['linefeed']
             logging.debug('Pi-Hole block rate: %s', string)
         con.close()
     except Exception:
