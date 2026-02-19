@@ -1,83 +1,86 @@
-import re
 import subprocess
+import re
+import logging
+
+def load_gpu_ram():
+    try:
+        out = subprocess.check_output(
+            "/usr/bin/vcgencmd get_mem gpu",
+            shell=True,
+            stderr=subprocess.DEVNULL
+        )
+        # Beispiel: "gpu=76M"
+        return int(re.sub(r"[^0-9]", "", out.decode()))
+    except Exception as e:
+        logging.error(f"GPU RAM lookup failed: {e}")
+        return 0
+
+GPU_RAM_MB = load_gpu_ram()
+
 import psutil
 import logging
-import time
+from functions import valuetocolor
 
-def _valuetocolor(value, translation):
-    for t in translation:
-        if value >= t[0]:
-            return t[1]
-    return translation[-1][1]
-
-def render(cf, draw, device, y, font, rectangle_y, term=None):
-    """
-    Render the RAM component and return the new y position.
-    Signatur: render(cf, draw, device, y, font, rectangle_y, term=None) -> int
-    """
-    # GPU-RAM ermitteln (vcgencmd), falls nicht vorhanden -> 0
+def render(cf, draw, device, y, font, rectangle_y=None, term=None):
     try:
-        out = subprocess.check_output('/usr/bin/vcgencmd get_mem gpu|cut -d= -f2', shell=True, stderr=subprocess.DEVNULL)
-        gpuram = int(re.sub(r'[^0-9]+', '', out.decode()))
+        font_color = cf['font']['color']
+        box_left = cf['boxmarginleft']
+        linefeed = cf['linefeed']
+        device_width = device.width - 1
+
+        # RAM-Daten
+        vm = psutil.virtual_memory()
+        used_mb = round((vm.total - vm.available) / (1024**2))
+        total_mb = round(vm.total / (1024**2))
+        percent = vm.percent
+
+        # GPU-RAM aus Cache
+        gpu_mb = GPU_RAM_MB
+
+        # Anzeige-String
+        string = f"{used_mb}+{gpu_mb}/{total_mb}MB"
+
+        # Farben
+        fillcolor = valuetocolor(percent, [[80, "Red"], [60, "Yellow"], [0, "Green"]])
+        fontcolor = "Grey" if fillcolor == "Yellow" else font_color
+
+        # Balkenbreite
+        bar_width = int((device_width - box_left) * (percent / 100))
+
+        # Zeichnen
+        draw.text((0, y), "RAM", font=font, fill=font_color)
+
+        # RAM-Balken
+        draw.rectangle(
+            (box_left, y, box_left + bar_width, y + rectangle_y),
+            fill=fillcolor
+        )
+
+        # GPU-Balken (nur wenn GPU-RAM > 0)
+        if gpu_mb > 0:
+            gpu_width = int((device_width - box_left) * (gpu_mb / (total_mb + gpu_mb)))
+            if gpu_width > 0:
+                band_h = max(1, rectangle_y // 3)
+                x0 = device_width - gpu_width
+
+                draw.rectangle((x0, y, device_width, y + band_h), fill="Red")
+                draw.rectangle((x0, y + band_h, device_width, y + 2*band_h), fill="Green")
+                draw.rectangle((x0, y + 2*band_h, device_width, y + rectangle_y), fill="Blue")
+
+        # Rahmen
+        draw.rectangle(
+            (box_left, y, device_width, y + rectangle_y),
+            outline=font_color,
+            width=1
+        )
+
+        # Text
+        draw.text((40, y), string, font=font, fill=fontcolor)
+
+        logging.debug("RAM: %s", string)
+        return y + linefeed
+
     except Exception:
-        gpuram = 0
-
-    vm = psutil.virtual_memory()
-    totalmem = round(vm.total / (1000 ** 2)) + gpuram
-    usagemem = round((vm.total - vm.available) / (1000 ** 2))
-    usageratemem = vm.percent
-    # Verhalten wie im Originalcode nachbilden
-    try:
-        usagerategpuram = 100 / (totalmem + gpuram) * gpuram if (totalmem + gpuram) > 0 else 0
-    except Exception:
-        usagerategpuram = 0
-
-    string = f"{usagemem}+{gpuram}/{totalmem}MB"
-
-    if cf.get('design') == 'beauty':
-        try:
-            draw.text((0, y), 'RAM', font=font, fill=cf['font']['color'])
-
-            width = (device.width - 1 - cf['boxmarginleft']) / 100 * usageratemem
-            gpuwidth = (device.width - 1 - cf['boxmarginleft']) / 100 * usagerategpuram
-
-            fontcolor = cf['font']['color']
-            fillcolor = _valuetocolor(usageratemem, [[80, "Red"], [60, "Yellow"], [0, "Green"]])
-            if fillcolor == 'Yellow':
-                fontcolor = 'Grey'
-
-            # Haupt-Usage-Balken
-            draw.rectangle(
-                (cf['boxmarginleft'], y, cf['boxmarginleft'] + int(width), y + int(rectangle_y)),
-                fill=fillcolor, width=0
-            )
-
-            # GPU-Balken rechts als drei farbige Segmente (wie im Original)
-            gw = int(gpuwidth)
-            if gw > 0:
-                band_h = max(1, int(rectangle_y / 3))
-                right_x0 = device.width - 1 - gw
-                # obere Band (rot)
-                draw.rectangle((right_x0, y, device.width - 1, y + band_h), fill='Red', width=0)
-                # mittleres Band (grün)
-                draw.rectangle((right_x0, y + band_h, device.width - 1, y + 2 * band_h), fill='Green', width=0)
-                # unteres Band (blau)
-                draw.rectangle((right_x0, y + 2 * band_h, device.width - 1, y + int(rectangle_y)), fill='Blue', width=0)
-
-            # Rahmen
-            draw.rectangle((cf['boxmarginleft'], y, device.width - 1, y + int(rectangle_y)), outline=cf['font']['color'], width=1)
-
-            # Text
-            draw.text((40, y), string, font=font, fill=fontcolor)
-            y += cf['linefeed']
-        except Exception:
-            logging.exception('Error drawing RAM component')
-            draw.text((0, y), 'RAM draw err', font=font, fill='RED')
-            y += cf.get('linefeed', 8)
-
-    elif cf.get('design') == 'terminal' and term is not None:
-        term.println('RAM: ' + string)
-        time.sleep(2)
-
-    logging.debug('RAM: %s', string)
-    return y
+        logging.exception("Error drawing RAM component")
+        draw.text((0, y), "RAM draw err", font=font, fill="RED")
+        return y + cf.get("linefeed", 8)
