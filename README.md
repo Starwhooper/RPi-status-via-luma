@@ -2,12 +2,16 @@
 
 To provide the Status of your Raspberry tested on Zero, Zero 2, 2, 3 and 4) to an ST7735S OLED Display. If you use a Wireshark 1.44", please note my previous solution: https://github.com/Starwhooper/RPi-status-on-OLED
 
+![Example](https://github.com/Starwhooper/RPi-status-via-luma/blob/main/pictures/image_20260219_192009.png)
+
 I use this script to get a quick and up-to-date status of the system every time I walk past my Raspberry Pis.
 In this way I can see at a glance the current workload, whether problems are looming and whether the service is currently running.
 
 My Raspberrys prepared to mounted in my 19Rack:
 ![Raspberry Pis in 19" rack](https://github.com/Starwhooper/RPi-status-via-luma/blob/main/pictures/somerpisinrack.webp)
 ![Front of a common enclosure](https://github.com/Starwhooper/RPi-status-via-luma/blob/main/pictures/commonfront.webp)
+
+
 
 ## Installation
 install all needed packages to prepare the software environtent of your Raspberry Pi:
