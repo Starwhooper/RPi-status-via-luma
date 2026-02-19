@@ -3,7 +3,7 @@ import re
 import logging
 import time
 
-def render(cf, draw, device, y, font, rectangle_y, term=None):
+def render(cf, draw, device, y, font, rectangle_y=None, term=None):
     try:
         mac = cf.get('component_checkmac', {}).get('mac', '')
         try:
@@ -23,12 +23,8 @@ def render(cf, draw, device, y, font, rectangle_y, term=None):
         except Exception:
             inactivetime = 99999
         string = f"{mac} {signal} {inactivetime}"
-        if cf.get('design') == 'beauty':
-            draw.text((0, y), f"{mac} {signal} {round(inactivetime/1000)}", font=font, fill=cf['font']['color'])
-            y += cf['linefeed']
-        elif cf.get('design') == 'terminal' and term is not None:
-            term.println('MAC: ' + string)
-            time.sleep(2)
+        draw.text((0, y), f"{mac} {signal} {round(inactivetime/1000)}", font=font, fill=cf['font']['color'])
+        y += cf['linefeed']
         logging.debug('MAC: %s', string)
     except Exception:
         logging.exception('Error rendering checkmac')
