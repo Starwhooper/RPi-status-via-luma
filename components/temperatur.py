@@ -1,7 +1,7 @@
 import logging
 from functions import valuetocolor
 
-def render(cf, draw, device, y, font, rectangle_y, term=None):
+def render(cf, draw, device, y, font, rectangle_y=None, term=None):
     try:
         # Temperatur lesen
         with open("/sys/class/thermal/thermal_zone0/temp") as f:
