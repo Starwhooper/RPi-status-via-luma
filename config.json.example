@@ -16,7 +16,11 @@
       "ttffile": "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
       "ttfsize": 8
    },
-   "imagerefresh":0.2,
+   "image": {
+      "refresh": 0.2,
+	  "toplimit": 10,
+	  "bottomlimit": 10
+   },
    "linefeed":10,
    "components":[
       "hostname",
