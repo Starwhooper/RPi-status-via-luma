@@ -54,3 +54,23 @@ def pushovermessage(cf,alert):
   )
  except:
   1
+  
+#scroll
+def scrollimage(whole_y, device_height, offset_y, stayontop, stayonbottom, toplimit, bottomlimit):
+    # Wenn der Inhalt höher ist als das Display → nach oben scrollen
+    if whole_y > device_height:
+        if stayontop > toplimit:
+            offset_y -= 1
+        else:
+            stayontop += 1
+    else:
+        # Wenn unten angekommen → Reset
+        if stayonbottom > bottomlimit:
+            offset_y = 0
+            stayontop = 0
+            stayonbottom = 0
+        else:
+            stayonbottom += 1
+
+    y = offset_y
+    return offset_y, stayontop, stayonbottom, y
