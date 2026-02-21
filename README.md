@@ -93,6 +93,7 @@ If you already use it, feel free to update with
 cd /opt/RPi-status-via-luma
 sudo git reset --hard #online nessesary if you changed the local code meanwhile
 sudo git pull origin main
+sudo systemctl restart rpistatus.service
 ```
 
 ## Hardware
