@@ -9,7 +9,7 @@ def short_name(interface):
     Kürzt Interface-Namen:
     eth0  -> e0
     wlan1 -> w1
-    enp3s0 -> e0 (nimmt ersten Buchstaben + letzte Ziffer)
+    (nimmt ersten Buchstaben + letzte Ziffer)
     """
     letters = ''.join([c for c in interface if c.isalpha()])
     digits = ''.join([c for c in interface if c.isdigit()])
@@ -42,10 +42,6 @@ def ping_status(interface, target, ip):
     - 'fail'       → Ping fehlgeschlagen
     """
 
-    # 1) Kein Kabel → noconnect
-    if not link_status(interface):
-        return "noconnect"
-
     # 2) Kabel steckt, aber keine IP → noip
     if ip == "noip":
         return "noip"
@@ -63,8 +59,8 @@ def status_color(status):
         return "Red"
     if status == "noip":
         return "Yellow"
-    if status == "noconnect":
-        return "Orange"
+#    if status == "noconnect":
+#        return "Orange"
     return "Red"
 
 
@@ -72,7 +68,7 @@ def render(cf, draw, device, y, font, rectangle_y=None, term=None):
     try:
         cfg = cf.get('component_ipping', {})
         ping_interval = max(1, cfg.get('pingintervall', 30))
-        font_color = cf['font']['color']
+        font_color = cf.get('font', {}).get('color', 'white')
         box_left = cf['boxmarginleft']
 
         lastping = globals().get('lastping', 0)
@@ -93,6 +89,14 @@ def render(cf, draw, device, y, font, rectangle_y=None, term=None):
             except Exception:
                 ip = 'noip'
 
+            if local_target == "" and ip != "noip":
+                parts = ip.split(".") 
+                parts[-1] = "1" 
+                local_target = ".".join(parts)
+                
+            if remote_target == "" and ip != "noip":
+                remote_target = '86.54.11.1' #DNS4EU
+
             # Pings nur alle X Sekunden ausführen
             if now >= lastping + ping_interval:
 
@@ -112,17 +116,6 @@ def render(cf, draw, device, y, font, rectangle_y=None, term=None):
             local_color = globals().get(f'ping_local_{name}', 'Red')
             remote_color = globals().get(f'ping_remote_{name}', 'Red')
 
-            # Anzeige
-            draw.text((0, y), name, font=font, fill=font_color)
-            draw.text((0, y), '  L', font=font, fill=local_color)
-            draw.text((0, y), '   R', font=font, fill=remote_color)
-
-            # IP oder "no ip" anzeigen
-            if ip == "noip":
-                draw.text((box_left, y), "no ip", font=font, fill="Yellow")
-            else:
-                draw.text((box_left, y), f"{ip}", font=font, fill=font_color)
-
             # Fortschrittsbalken
             elapsed = int(now) - lastping
             bar_width = int(device.width / ping_interval * elapsed)
@@ -132,6 +125,25 @@ def render(cf, draw, device, y, font, rectangle_y=None, term=None):
                 (0, y + 11, bar_width, y + rectangle_y + 2),
                 fill='Green'
             )
+            
+            if bar_width <= 3 and ip != "noip":
+                draw.text((0, y), name + "L", font=font, fill=font_color)
+                draw.text((box_left, y), f"oo {local_target}", font=font, fill=font_color)
+            elif bar_width <= 5 and ip != "noip":
+                draw.text((0, y), name + " R", font=font, fill=font_color)
+                draw.text((box_left, y), f"oo {remote_target}", font=font, fill=font_color)
+            else:
+                # Anzeige
+                draw.text((0, y), name, font=font, fill=font_color)
+                draw.text((0, y), '  L', font=font, fill=local_color)
+                draw.text((0, y), '   R', font=font, fill=remote_color)
+    
+                # IP oder "no ip" anzeigen
+                if ip == "noip":
+                    draw.text((box_left, y), "no ip", font=font, fill="Yellow")
+                else:
+                    draw.text((box_left, y), f"{ip}", font=font, fill=font_color)
+
 
             logging.debug("IP: %s %s", name, ip)
             y += cf['linefeed'] + 2
