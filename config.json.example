@@ -72,18 +72,18 @@
     "devices": [
      {
       "interface": "eth0",
-      "local": "192.168.20.1",
-      "remote": "8.8.8.8"
+      "local": "",
+      "remote": ""
      },
      {
       "interface": "eth1",
-      "local": "192.168.20.1",
-      "remote": "8.8.8.8"
+      "local": "",
+      "remote": ""
      },
      {
       "interface": "wlan0",
-      "local": "192.168.2.1",
-      "remote": "8.8.4.4"
+      "local": "",
+      "remote": ""
      }
     ]
    },
