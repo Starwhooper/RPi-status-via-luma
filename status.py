@@ -98,12 +98,12 @@ def main(device):
          offset_y, stayontop, stayonbottom, y = scrollimage( whole_y, device.height, offset_y, stayontop, stayonbottom, toplimit, bottomlimit )
        
          #calculate max row height
-         rectangle_y = draw.textbbox(xy=(0,0), text='AQjgp,;Ä', font=font)[3]
+         rectangle_y = draw.textbbox(xy=(0,0), text='AQjgp,;Ä', font=font)[3] - 1
        
          #check all components
          for componentname in cf['components']:
           try:
-           y = render_component(componentname, cf, draw, device, y, font, rectangle_y, term=None)
+           y = render_component(componentname, cf, draw, device, y, font, rectangle_y)
           except:
            draw.text((0,y), 'ERR ' + componentname, font = font, fill = 'RED')
            y += cf['linefeed']
