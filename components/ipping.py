@@ -2,6 +2,7 @@ import time
 import os
 import netifaces
 import logging
+import psutil
 
 # lastPing pro Gerät (Key = Interface-Name)
 lastping = {}
@@ -65,6 +66,12 @@ def status_color(status):
     return "Red"
 
 
+
+
+def interface_exists(name: str) -> bool:
+    return name in psutil.net_if_addrs()
+
+
 def render(cf, draw, device, y, font, rectangle_y=None, term=None):
     try:
         cfg = cf.get('component_ipping', {})
@@ -90,53 +97,58 @@ def render(cf, draw, device, y, font, rectangle_y=None, term=None):
             local_target = dev.get("local", "")
             remote_target = dev.get("remote", "")
 
-            # IP-Adresse holen
-            try:
-                ip = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
-            except Exception:
-                ip = 'noip'
-
-            # Lokales Ziel automatisch bestimmen
-            if local_target == "" and ip != "noip":
-                parts = ip.split(".")
-                parts[-1] = "1"
-                local_target = ".".join(parts)
-
-            # Remote Ziel Standardwert
-            if remote_target == "" and ip != "noip":
-                remote_target = '86.54.11.1'
-
-            # Prüfen ob Ping fällig ist
-            if now >= lastping[dev_key] + ping_interval:
-
-                local_status = ping_status(interface, local_target, ip) if local_target else "fail"
-                remote_status = ping_status(interface, remote_target, ip) if remote_target else "fail"
-
-                globals()[f'ping_local_{nameonscreen}'] = status_color(local_status)
-                globals()[f'ping_remote_{nameonscreen}'] = status_color(remote_status)
-
-                lastping[dev_key] = int(now)
-
-            # Farben holen
-            local_color = globals().get(f'ping_local_{nameonscreen}', 'Red')
-            remote_color = globals().get(f'ping_remote_{nameonscreen}', 'Red')
-
-            # Fortschrittsbalken pro Gerät
-            elapsed = int(now) - lastping[dev_key]
-            bar_width = int(device.width / ping_interval * elapsed)
-            bar_width = min(device.width - 1, bar_width)
-
-            draw.rectangle(
-                (0, y + 11, bar_width, y + rectangle_y + 2),
-                fill='Green'
-            )
+            #prüfen ob NIC existiert
+            if not interface_exists(interface): 
+             ip = 'notexist'
+            else:
+                
+             # IP-Adresse holen
+             try:
+                 ip = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
+             except Exception:
+                 ip = 'noip'
+             
+             # Lokales Ziel automatisch bestimmen
+             if local_target == "" and ip != "noip":
+                 parts = ip.split(".")
+                 parts[-1] = "1"
+                 local_target = ".".join(parts)
+             
+             # Remote Ziel Standardwert
+             if remote_target == "" and ip != "noip":
+                 remote_target = '86.54.11.1'
+             
+             # Prüfen ob Ping fällig ist
+             if now >= lastping[dev_key] + ping_interval:
+             
+                 local_status = ping_status(interface, local_target, ip) if local_target else "fail"
+                 remote_status = ping_status(interface, remote_target, ip) if remote_target else "fail"
+             
+                 globals()[f'ping_local_{nameonscreen}'] = status_color(local_status)
+                 globals()[f'ping_remote_{nameonscreen}'] = status_color(remote_status)
+             
+                 lastping[dev_key] = int(now)
+             
+             # Farben holen
+             local_color = globals().get(f'ping_local_{nameonscreen}', 'Red')
+             remote_color = globals().get(f'ping_remote_{nameonscreen}', 'Red')
+             
+             # Fortschrittsbalken pro Gerät
+             elapsed = int(now) - lastping[dev_key]
+             bar_width = int(device.width / ping_interval * elapsed)
+             bar_width = min(device.width - 1, bar_width)
+             
+             draw.rectangle(
+                 (0, y + 11, bar_width, y + rectangle_y + 2),
+                 fill='Green'
+             )
 
             # Anzeige abhängig vom Fortschritt
-            if bar_width <= 3 and ip != "noip":
+            if bar_width <= 3 and ip not in ("noip", "notexist"):
                 draw.text((0, y), nameonscreen + "L", font=font, fill=font_color)
                 draw.text((box_left, y), f"oo {local_target}", font=font, fill=font_color)
 
-            elif bar_width <= 5 and ip != "noip":
+            elif bar_width <= 5 and ip not in ("noip", "notexist"):
                 draw.text((0, y), nameonscreen + " R", font=font, fill=font_color)
                 draw.text((box_left, y), f"oo {remote_target}", font=font, fill=font_color)
 
@@ -147,6 +159,8 @@ def render(cf, draw, device, y, font, rectangle_y=None, term=None):
 
                 if ip == "noip":
                     draw.text((box_left, y), "no ip", font=font, fill="Yellow")
+                elif ip == "notexist":
+                    draw.text((box_left, y), "not exist", font=font, fill="Red")                    
                 else:
                     draw.text((box_left, y), f"{ip}", font=font, fill=font_color)
 
