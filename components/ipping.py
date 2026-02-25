@@ -138,24 +138,24 @@ def render(cf, draw, device, y, font, rectangle_y=None, term=None):
              bar_width = int(device.width / ping_interval * elapsed)
              bar_width = min(device.width - 1, bar_width)
              
-             draw.rectangle(
-                 (0, y + 11, bar_width, y + rectangle_y + 2),
-                 fill='Green'
-             )
+             if ip not in ("notexist"):
+              draw.rectangle(
+                  (0, y + 11, bar_width, y + rectangle_y + 2),
+                  fill='Green'
+              )
 
             # Anzeige abhängig vom Fortschritt
             if bar_width <= 3 and ip not in ("noip", "notexist"):
                 draw.text((0, y), nameonscreen + "L", font=font, fill=font_color)
-                draw.text((box_left, y), f"oo {local_target}", font=font, fill=font_color)
+                draw.text((box_left, y), f"o_o {local_target}", font=font, fill=font_color)
 
             elif bar_width <= 5 and ip not in ("noip", "notexist"):
                 draw.text((0, y), nameonscreen + " R", font=font, fill=font_color)
-                draw.text((box_left, y), f"oo {remote_target}", font=font, fill=font_color)
+                draw.text((box_left, y), f"o_o {remote_target}", font=font, fill=font_color)
 
             else:
                 draw.text((0, y), nameonscreen, font=font, fill=font_color)
-                draw.text((0, y), '  L', font=font, fill=local_color)
-                draw.text((0, y), '   R', font=font, fill=remote_color)
+                
 
                 if ip == "noip":
                     draw.text((box_left, y), "no ip", font=font, fill="Yellow")
@@ -163,6 +163,9 @@ def render(cf, draw, device, y, font, rectangle_y=None, term=None):
                     draw.text((box_left, y), "not exist", font=font, fill="Red")                    
                 else:
                     draw.text((box_left, y), f"{ip}", font=font, fill=font_color)
+                    draw.text((0, y), '  L', font=font, fill=local_color)
+                    draw.text((0, y), '   R', font=font, fill=remote_color)
+
 
             logging.debug("IP: %s %s", nameonscreen, ip)
             y += cf['linefeed'] + 2
