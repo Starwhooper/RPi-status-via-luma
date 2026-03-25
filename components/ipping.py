@@ -3,9 +3,25 @@ import os
 import netifaces
 import logging
 import psutil
+import subprocess
+import re
 
 # lastPing pro Gerät (Key = Interface-Name)
 lastping = {}
+
+def get_speed(interface):
+    result = subprocess.run(
+        ["ethtool", interface],
+        capture_output=True,
+        text=True
+    )
+    speed_match = re.search(r"Speed:\s+(\d+Mb/s)", result.stdout)
+    duplex_match = re.search(r"Duplex:\s+(Full|Half)", result.stdout)
+
+    speed = speed_match.group(1) if speed_match else "Unknown"
+    duplex = duplex_match.group(1) if duplex_match else "Unknown"
+    
+    return f"{speed} {duplex}"
 
 
 def short_name(interface):
@@ -143,15 +159,19 @@ def render(cf, draw, device, y, font, rectangle_y=None, term=None):
                   (0, y + 11, bar_width, y + rectangle_y + 2),
                   fill='Green'
               )
-
+              
             # Anzeige abhängig vom Fortschritt
             if bar_width <= 3 and ip not in ("noip", "notexist"):
                 draw.text((0, y), nameonscreen + "L", font=font, fill=font_color)
                 draw.text((box_left, y), f"o_o {local_target}", font=font, fill=font_color)
 
-            elif bar_width <= 5 and ip not in ("noip", "notexist"):
+            elif bar_width <= 6 and ip not in ("noip", "notexist"):
                 draw.text((0, y), nameonscreen + " R", font=font, fill=font_color)
                 draw.text((box_left, y), f"o_o {remote_target}", font=font, fill=font_color)
+
+            elif bar_width <= 9 and ip not in ("noip", "notexist"):
+                draw.text((0, y), nameonscreen, font=font, fill=font_color)
+                draw.text((box_left, y), get_speed(interface), font=font, fill=font_color)
 
             else:
                 draw.text((0, y), nameonscreen, font=font, fill=font_color)
@@ -160,7 +180,7 @@ def render(cf, draw, device, y, font, rectangle_y=None, term=None):
                 if ip == "noip":
                     draw.text((box_left, y), "no ip", font=font, fill="Yellow")
                 elif ip == "notexist":
-                    draw.text((box_left, y), "not exist", font=font, fill="Red")                    
+                    draw.text((box_left, y), "device not exist", font=font, fill="Red")                    
                 else:
                     draw.text((box_left, y), f"{ip}", font=font, fill=font_color)
                     draw.text((0, y), '  L', font=font, fill=local_color)
