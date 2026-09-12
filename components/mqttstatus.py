@@ -2,19 +2,19 @@ import logging
 import time
 import paho.mqtt.client as mqtt
 
-# globaler Speicher für den letzten MQTT-Payload
+# Global storage for the last MQTT payload
 last_payload = None
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         client.subscribe("$SYS/broker/load/messages/sent/1min")
     else:
-        print("Verbindungsfehler:", rc)
+        print("Connection error:", rc)
 
 def on_message(client, userdata, msg):
     global last_payload
-    last_payload = msg.payload.decode()  # Payload speichern
-    client.disconnect()  # nach der ersten Nachricht beenden
+    last_payload = msg.payload.decode()  # Store payload
+    client.disconnect()  # Disconnect after receiving first message
 
 
 
@@ -30,15 +30,15 @@ def render(cf, draw, device, y, font, rectangle_y, term=None):
     client.loop_forever()
 
     try:
-        display_text = last_payload if last_payload else "no MQTT data"
+        display_text = int(float(last_payload)) if last_payload else "no MQTT data"
         if cf.get('design') == 'beauty':
             draw.text((0, y), 'MQTT', font=font, fill=cf['font']['color'])
-            draw.text((cf['boxmarginleft'], y), display_text + ' pubmin', font=font, fill=cf['font']['color'])
+            draw.text((cf['boxmarginleft'], y), str(display_text) + ' pubmin', font=font, fill=cf['font']['color'])
             y += cf['linefeed']
         elif cf.get('design') == 'terminal' and term is not None:
-            term.println('MQTT ' + display_text + ' pubmin')
+            term.println('MQTT ' + str(display_text) + ' pubmin')
             time.sleep(2)
-        logging.debug('MQTT: ' + display_text + ' pubmin')
+        logging.debug('MQTT: ' + str(display_text) + ' pubmin')
     except Exception:
         logging.exception('Error rendering MQTT payload')
         draw.text((0, y), 'render err', font=font, fill='RED')
