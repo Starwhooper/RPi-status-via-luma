@@ -1,30 +1,45 @@
 import logging
+import struct
 
 def load_os_info():
     try:
         # /etc/os-release lesen
         os_info = {}
-        with open("/etc/os-release", "r") as f:
-            for line in f:
-                key, _, value = line.partition("=")
-                os_info[key.strip()] = value.strip().strip('"')
-
-        # Debian-Version lesen
         try:
-            with open("/etc/debian_version", "r") as f:
-                debian_version = f.read().strip()
+            with open("/etc/os-release", "r") as f:
+                for line in f:
+                    if "=" in line:
+                        key, _, value = line.partition("=")
+                        os_info[key.strip()] = value.strip().strip('"')
         except Exception:
-            debian_version = "unknown"
+            pass
 
-        # Ausgabe zusammenbauen
-        codename = os_info.get("VERSION_CODENAME", "unknown")
-        os_version_name = f"{debian_version} ({codename})"
+        debian_version = os_info.get("DEBIAN_VERSION_FULL", "").strip()
+        if not debian_version:
+            try:
+                with open("/etc/debian_version", "r") as f:
+                    debian_version = f.read().strip()
+            except Exception:
+                debian_version = "unknown"
+
+        codename = os_info.get("VERSION_CODENAME", "").strip()
+
+        if not codename:
+         codename = "?"
+
+        system_bits = f"{struct.calcsize('P') * 8}B" 
+
+        if codename != "?" and codename in debian_version.lower():
+            os_version_name = f"{debian_version} {system_bits}"
+        else:
+            os_version_name = f"{debian_version} ({codename}) {system_bits}"
 
         return os_version_name
 
     except Exception as e:
         logging.error(f"OS info lookup failed: {e}")
         return "unknown"
+
 
 # globaler Cache
 OS_VERSION_NAME = load_os_info()
