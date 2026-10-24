@@ -3,7 +3,11 @@ import struct
 
 def load_os_info():
     try:
-        # /etc/os-release lesen
+        version = ""
+        bit = ""
+        codename = ""
+
+        # common
         os_info = {}
         try:
             with open("/etc/os-release", "r") as f:
@@ -14,31 +18,30 @@ def load_os_info():
         except Exception:
             pass
 
-        debian_version = os_info.get("DEBIAN_VERSION_FULL", "").strip()
-        if not debian_version:
-            try:
-                with open("/etc/debian_version", "r") as f:
-                    debian_version = f.read().strip()
-            except Exception:
-                debian_version = "unknown"
+        #version
+        version = os_info.get("DEBIAN_VERSION_FULL", "").strip()
 
+        if not version:
+            try:
+             with open("/etc/debian_version", "r") as f:
+              version = f.read().strip()
+            except Exception:
+             pass
+
+        #codename
         codename = os_info.get("VERSION_CODENAME", "").strip()
 
-        if not codename:
-         codename = "?"
+        #bit
+        bit = f"{struct.calcsize('P') * 8}B"
 
-        system_bits = f"{struct.calcsize('P') * 8}B" 
-
-        if codename != "?" and codename in debian_version.lower():
-            os_version_name = f"{debian_version} {system_bits}"
-        else:
-            os_version_name = f"{debian_version} ({codename}) {system_bits}"
+        os_version_name = f"{version} {bit} {codename}".strip()
 
         return os_version_name
 
     except Exception as e:
         logging.error(f"OS info lookup failed: {e}")
         return "unknown"
+
 
 
 # globaler Cache
