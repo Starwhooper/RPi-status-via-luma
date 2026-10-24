@@ -55,6 +55,13 @@ sudo apt install python3-pip libopenjp2-7 python3-psutil python3-netifaces git -
 sudo apt install python3-luma.lcd
 sudo apt install python3-luma.oled
 ```
+#### install optional components
+the default font file "DejaVu Serif.ttf" is not more included in Raspbian trixi. But you could install it manually on this way:
+```bash
+sudo apt install -y fonts-dejavu-core
+```
+But don't be afraid, the tool is able to handle in case the font is missing.
+
 
 ### install this tool itself:
 ```bash
