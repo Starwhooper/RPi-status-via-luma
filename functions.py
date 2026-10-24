@@ -17,7 +17,11 @@ def defaultfont(cf):
   else:
    logging.error('font ' + ttf_file + ' not found')
  if not font:
-  font = ImageFont.load_default()
+  try:
+   # new solution on trixi
+   font = ImageFont.load_default_imagefont()
+  except AttributeError:
+   font = ImageFont.load_default()
  return font
 
 #####request graphic feedback from component
